@@ -1,0 +1,14 @@
+{
+  "name": "Luminari Web",
+  "short_name": "Luminari",
+  "description": "Browser client for LuminariMUD-compatible games with a WebSocket-to-Telnet proxy and MSDP-driven game panels.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "browser"],
+  "orientation": "any",
+  "background_color": "#020617",
+  "theme_color": "#0f766e",
+  "categories": ["games", "utilities"]
+}

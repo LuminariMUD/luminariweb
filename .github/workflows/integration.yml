@@ -1,0 +1,112 @@
+name: integration
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: integration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integration:
+    name: Production startup smoke checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      PORT: 5191
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production assets
+        run: npm run build
+
+      - name: Start production server
+        run: npm start > integration-server.log 2>&1 &
+
+      - name: Wait for health endpoint
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:5191/health > /tmp/health.json; then
+              exit 0
+            fi
+
+            sleep 2
+          done
+
+          echo "Server did not become ready in time."
+          cat integration-server.log
+          exit 1
+
+      - name: Verify health response
+        run: |
+          node --input-type=module -e "
+            import { readFileSync } from 'node:fs';
+
+            const health = JSON.parse(readFileSync('/tmp/health.json', 'utf8'));
+
+            if (health.ok !== true) {
+              throw new Error('Expected /health to return { ok: true }.');
+            }
+          "
+
+      - name: Verify settings endpoint
+        run: |
+          curl -fsS http://127.0.0.1:5191/api/settings | node --input-type=module -e "
+            import { readFileSync } from 'node:fs';
+
+            const settings = JSON.parse(readFileSync(0, 'utf8'));
+
+            if (typeof settings !== 'object' || settings === null) {
+              throw new Error('Expected /api/settings to return an object.');
+            }
+
+            if (typeof settings.ports?.server !== 'number') {
+              throw new Error('Expected /api/settings to expose the server port.');
+            }
+          "
+
+      - name: Verify websocket endpoint
+        run: |
+          node --input-type=module <<'EOF'
+          import { WebSocket } from 'ws';
+
+          const socket = new WebSocket('ws://127.0.0.1:5191/ws', {
+            headers: {
+              Origin: 'http://127.0.0.1:5191',
+            },
+          });
+
+          await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              reject(new Error('WebSocket connect timeout.'));
+            }, 10000);
+
+            socket.once('open', () => {
+              clearTimeout(timeout);
+              socket.close();
+              resolve();
+            });
+
+            socket.once('error', (error) => {
+              clearTimeout(timeout);
+              reject(error);
+            });
+          });
+          EOF

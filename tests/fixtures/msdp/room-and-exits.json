@@ -1,0 +1,466 @@
+{
+  "schemaVersion": 1,
+  "fixtureFile": "room-and-exits",
+  "description": "Room, area, vnum, exits, world time, and room table fixtures.",
+  "fixtures": [
+    {
+      "id": "room.scalar.identity",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from PRD source protocol facts for confirmed room identity MSDP variables.",
+        "sanitized": true
+      },
+      "description": "Room name, area name, and room vnum parse as scalar values.",
+      "coverage": ["room", "area", "scalar", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ROOM_NAME, AREA_NAME, and ROOM_VNUM.",
+        "Session 02 maps roomName, areaName, and roomVnum as first-class MudState fields."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ROOM_NAME",
+        "VAL",
+        "Hall of Fixtures",
+        "VAR",
+        "AREA_NAME",
+        "VAL",
+        "Test Keep",
+        "VAR",
+        "ROOM_VNUM",
+        "VAL",
+        "1001"
+      ],
+      "expectedPairs": [
+        ["ROOM_NAME", "Hall of Fixtures"],
+        ["AREA_NAME", "Test Keep"],
+        ["ROOM_VNUM", 1001]
+      ],
+      "notes": ["Room labels are synthetic and avoid live area capture content."]
+    },
+    {
+      "id": "room.exits.table",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from PRD source protocol facts for confirmed ROOM_EXITS.",
+        "sanitized": true
+      },
+      "description": "ROOM_EXITS parses as a table with mixed numeric destination ids and string status values.",
+      "coverage": ["room-exits", "table", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ROOM_EXITS is populated by source and should support room/map work."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ROOM_EXITS",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "north",
+        "VAL",
+        "1002",
+        "VAR",
+        "east",
+        "VAL",
+        "1003",
+        "VAR",
+        "down",
+        "VAL",
+        "closed",
+        "TABLE_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "ROOM_EXITS",
+          {
+            "north": 1002,
+            "east": 1003,
+            "down": "closed"
+          }
+        ]
+      ],
+      "notes": ["The current parser preserves table shape as an object."]
+    },
+    {
+      "id": "room.room.table",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from PRD source protocol facts for confirmed ROOM structured data.",
+        "sanitized": true
+      },
+      "description": "ROOM parses as a structured table for future raw room payload coverage.",
+      "coverage": ["room", "table", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ROOM is populated by source.",
+        "Session 02 keeps structured MSDP payloads as MudValue until shapes are confirmed."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ROOM",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "Hall of Fixtures",
+        "VAR",
+        "area",
+        "VAL",
+        "Test Keep",
+        "VAR",
+        "vnum",
+        "VAL",
+        "1001",
+        "VAR",
+        "terrain",
+        "VAL",
+        "stone",
+        "TABLE_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "ROOM",
+          {
+            "name": "Hall of Fixtures",
+            "area": "Test Keep",
+            "vnum": 1001,
+            "terrain": "stone"
+          }
+        ]
+      ],
+      "notes": [
+        "Lowercase table keys are synthetic parser keys and are not a source-level shape guarantee."
+      ]
+    },
+    {
+      "id": "room.world.time",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from PRD source protocol facts for confirmed WORLD_TIME.",
+        "sanitized": true
+      },
+      "description": "WORLD_TIME parses as a string because the client currently treats it as optional text.",
+      "coverage": ["world-time", "scalar"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms WORLD_TIME.",
+        "shared/mud.ts maps worldTime to an optional string."
+      ],
+      "payloadTokens": ["VAR", "WORLD_TIME", "VAL", "Day 12, Month 3, Year 204"],
+      "expectedPairs": [["WORLD_TIME", "Day 12, Month 3, Year 204"]],
+      "notes": ["The text value is synthetic and used only for parser and mapping coverage."]
+    },
+    {
+      "id": "room.minimap.scalar",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Phase 04 Session 03 source-backed MINIMAP contract.",
+        "sanitized": true
+      },
+      "description": "MINIMAP parses as plain display text after source color stripping.",
+      "coverage": ["minimap", "scalar"],
+      "sourceFacts": [
+        "Luminari-Source commit 7dbddcd1 emits MINIMAP from automap data after color stripping.",
+        "Phase 04 Session 03 maps MINIMAP by default while preserving room/exits fallback for missing or empty map text."
+      ],
+      "payloadTokens": ["VAR", "MINIMAP", "VAL", "  N\nW @ E\n  S"],
+      "expectedPairs": [["MINIMAP", "  N\nW @ E\n  S"]],
+      "notes": ["The minimap text is synthetic and does not include live room geometry."]
+    },
+    {
+      "id": "room.partial.identity",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 05 room display partial-state requirements.",
+        "sanitized": true
+      },
+      "description": "Partial room identity values keep zero and blank values distinct from missing data.",
+      "coverage": [
+        "room",
+        "area",
+        "world-time",
+        "partial-data",
+        "empty-values",
+        "scalar",
+        "numeric-normalization"
+      ],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ROOM_NAME, AREA_NAME, ROOM_VNUM, and WORLD_TIME.",
+        "Session 05 requires zero vnum and blank text to stay distinct from missing room fields."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ROOM_NAME",
+        "VAL",
+        "",
+        "VAR",
+        "AREA_NAME",
+        "VAL",
+        "Partial Keep",
+        "VAR",
+        "ROOM_VNUM",
+        "VAL",
+        "0",
+        "VAR",
+        "WORLD_TIME",
+        "VAL",
+        ""
+      ],
+      "expectedPairs": [
+        ["ROOM_NAME", ""],
+        ["AREA_NAME", "Partial Keep"],
+        ["ROOM_VNUM", 0],
+        ["WORLD_TIME", ""]
+      ],
+      "notes": [
+        "Blank strings are synthetic and verify UI empty-state handling without live MUD access."
+      ]
+    },
+    {
+      "id": "room.exits.string",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 05 conservative ROOM_EXITS fallback requirements.",
+        "sanitized": true
+      },
+      "description": "ROOM_EXITS can arrive as a scalar string and must remain available for raw fallback display.",
+      "coverage": ["room-exits", "scalar", "raw-fallback"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ROOM_EXITS.",
+        "Session 05 requires string exit payloads to render without inventing mapper semantics."
+      ],
+      "payloadTokens": ["VAR", "ROOM_EXITS", "VAL", "north east down"],
+      "expectedPairs": [["ROOM_EXITS", "north east down"]],
+      "notes": ["Exit labels are synthetic and do not prove final source exit formatting."]
+    },
+    {
+      "id": "room.exits.array",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 05 array exit display requirements.",
+        "sanitized": true
+      },
+      "description": "ROOM_EXITS can be represented as an array of direction labels.",
+      "coverage": ["room-exits", "array"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ROOM_EXITS.",
+        "Phase 01 parser coverage supports MSDP arrays."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ROOM_EXITS",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "north",
+        "VAL",
+        "east",
+        "VAL",
+        "down",
+        "ARRAY_CLOSE"
+      ],
+      "expectedPairs": [["ROOM_EXITS", ["north", "east", "down"]]],
+      "notes": ["Array direction labels are representative display inputs only."]
+    },
+    {
+      "id": "room.empty.values",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 05 empty room context requirements.",
+        "sanitized": true
+      },
+      "description": "Explicit empty ROOM and ROOM_EXITS values remain present data, not missing variables.",
+      "coverage": ["room", "room-exits", "empty-values", "array", "table"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ROOM and ROOM_EXITS.",
+        "Session 05 requires empty room context to stay distinct from waiting, disabled, offline, and error states."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ROOM",
+        "VAL",
+        "TABLE_OPEN",
+        "TABLE_CLOSE",
+        "VAR",
+        "ROOM_EXITS",
+        "VAL",
+        "ARRAY_OPEN",
+        "ARRAY_CLOSE"
+      ],
+      "expectedPairs": [
+        ["ROOM", {}],
+        ["ROOM_EXITS", []]
+      ],
+      "notes": ["Empty structures are synthetic parser contracts for display-state tests."]
+    },
+    {
+      "id": "room.exits.object.unknown",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 05 object-like exit display requirements.",
+        "sanitized": true
+      },
+      "description": "ROOM_EXITS object-like rows preserve destination, status, and unknown fields for bounded summaries.",
+      "coverage": ["room-exits", "table", "object-like", "unknown-fields", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ROOM_EXITS.",
+        "Session 05 requires unknown exit fields to be surfaced conservatively."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ROOM_EXITS",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "north",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "vnum",
+        "VAL",
+        "1002",
+        "VAR",
+        "status",
+        "VAL",
+        "open",
+        "TABLE_CLOSE",
+        "VAR",
+        "portal",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "destination",
+        "VAL",
+        "Astral Gate",
+        "VAR",
+        "status",
+        "VAL",
+        "uncertain",
+        "VAR",
+        "color",
+        "VAL",
+        "silver",
+        "TABLE_CLOSE",
+        "TABLE_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "ROOM_EXITS",
+          {
+            "north": {
+              "vnum": 1002,
+              "status": "open"
+            },
+            "portal": {
+              "destination": "Astral Gate",
+              "status": "uncertain",
+              "color": "silver"
+            }
+          }
+        ]
+      ],
+      "notes": [
+        "Object keys are synthetic and verify deterministic display behavior, not final source schema."
+      ]
+    },
+    {
+      "id": "room.room.partial.unknown",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 05 structured ROOM fallback requirements.",
+        "sanitized": true
+      },
+      "description": "ROOM partial table data can supply identity fields and bounded unknown-field text.",
+      "coverage": [
+        "room",
+        "table",
+        "partial-data",
+        "unknown-fields",
+        "raw-fallback",
+        "numeric-normalization"
+      ],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ROOM.",
+        "Session 05 requires structured ROOM payloads to remain secondary to terminal room prose."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ROOM",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "Unknown Field Room",
+        "VAR",
+        "vnum",
+        "VAL",
+        "1001",
+        "VAR",
+        "terrain",
+        "VAL",
+        "stone",
+        "VAR",
+        "weather",
+        "VAL",
+        "windy",
+        "TABLE_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "ROOM",
+          {
+            "name": "Unknown Field Room",
+            "vnum": 1001,
+            "terrain": "stone",
+            "weather": "windy"
+          }
+        ]
+      ],
+      "notes": [
+        "Unknown fields are synthetic and should be displayed as bounded secondary details."
+      ]
+    },
+    {
+      "id": "room.exits.malformed.scalar",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 05 malformed/raw fallback requirements.",
+        "sanitized": true
+      },
+      "description": "A malformed-looking ROOM_EXITS scalar remains a bounded raw fallback value.",
+      "coverage": ["room-exits", "malformed", "raw-fallback", "scalar"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ROOM_EXITS.",
+        "Session 05 requires malformed or uncertain exit values to remain visible without parser crashes."
+      ],
+      "payloadTokens": ["VAR", "ROOM_EXITS", "VAL", "north=??; east={vnum"],
+      "expectedPairs": [["ROOM_EXITS", "north=??; east={vnum"]],
+      "notes": [
+        "This is a display fallback fixture; byte-level malformed MSDP coverage remains in malformed-payloads.json."
+      ]
+    }
+  ]
+}

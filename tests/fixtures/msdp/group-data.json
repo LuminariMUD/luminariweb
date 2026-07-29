@@ -1,0 +1,382 @@
+{
+  "schemaVersion": 1,
+  "fixtureFile": "group-data",
+  "description": "Representative GROUP payload fixtures with member tables, partial member data, empty collections, unknown fields, and object-like payloads.",
+  "fixtures": [
+    {
+      "id": "group.full.members",
+      "version": 2,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from PRD source protocol facts for confirmed GROUP.",
+        "sanitized": true
+      },
+      "description": "GROUP parses as an array of complete member tables with health and movement maximum values.",
+      "coverage": ["group", "array", "table", "numeric-normalization", "movement-max", "status"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms GROUP.",
+        "Phase 02 plans to render member names, leader markers, health, movement, and status values."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "GROUP",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "Leader One",
+        "VAR",
+        "leader",
+        "VAL",
+        "1",
+        "VAR",
+        "health",
+        "VAL",
+        "90",
+        "VAR",
+        "healthMax",
+        "VAL",
+        "100",
+        "VAR",
+        "movement",
+        "VAL",
+        "70",
+        "VAR",
+        "movementMax",
+        "VAL",
+        "120",
+        "VAR",
+        "status",
+        "VAL",
+        "ready",
+        "TABLE_CLOSE",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "Scout Two",
+        "VAR",
+        "leader",
+        "VAL",
+        "0",
+        "VAR",
+        "health",
+        "VAL",
+        "64",
+        "VAR",
+        "healthMax",
+        "VAL",
+        "80",
+        "VAR",
+        "movement",
+        "VAL",
+        "95",
+        "VAR",
+        "movementMax",
+        "VAL",
+        "100",
+        "VAR",
+        "status",
+        "VAL",
+        "scouting",
+        "TABLE_CLOSE",
+        "ARRAY_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "GROUP",
+          [
+            {
+              "name": "Leader One",
+              "leader": 1,
+              "health": 90,
+              "healthMax": 100,
+              "movement": 70,
+              "movementMax": 120,
+              "status": "ready"
+            },
+            {
+              "name": "Scout Two",
+              "leader": 0,
+              "health": 64,
+              "healthMax": 80,
+              "movement": 95,
+              "movementMax": 100,
+              "status": "scouting"
+            }
+          ]
+        ]
+      ],
+      "notes": [
+        "Member names are synthetic and not live player names.",
+        "The parser currently returns numeric leader flags as numbers, not booleans.",
+        "Member field names are representative display contracts and not a final source schema claim."
+      ]
+    },
+    {
+      "id": "group.partial.member",
+      "version": 2,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 03 optional-data behavior and confirmed GROUP support.",
+        "sanitized": true
+      },
+      "description": "GROUP tolerates member tables with missing names, missing maximum values, zero values, and blank status.",
+      "coverage": [
+        "group",
+        "array",
+        "table",
+        "partial-data",
+        "empty-values",
+        "numeric-normalization"
+      ],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms GROUP.",
+        "Session 03 requires missing optional data to render deliberately rather than break UI state."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "GROUP",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "Partial Member",
+        "VAR",
+        "health",
+        "VAL",
+        "42",
+        "TABLE_CLOSE",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "health",
+        "VAL",
+        "0",
+        "VAR",
+        "movement",
+        "VAL",
+        "0",
+        "VAR",
+        "leader",
+        "VAL",
+        "no",
+        "VAR",
+        "status",
+        "VAL",
+        "",
+        "TABLE_CLOSE",
+        "ARRAY_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "GROUP",
+          [
+            {
+              "name": "Partial Member",
+              "health": 42
+            },
+            {
+              "health": 0,
+              "movement": 0,
+              "leader": "no",
+              "status": ""
+            }
+          ]
+        ]
+      ],
+      "notes": [
+        "The fixture intentionally omits leader and maximum values for the first member.",
+        "The second member intentionally omits name and preserves zero values."
+      ]
+    },
+    {
+      "id": "group.empty.collection",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from current parser array behavior and Session 03 empty-state requirements.",
+        "sanitized": true
+      },
+      "description": "GROUP can arrive as an explicit empty array.",
+      "coverage": ["group", "array", "empty-values"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms GROUP.",
+        "Session 03 requires empty group payloads to stay distinct from missing or disabled mappings."
+      ],
+      "payloadTokens": ["VAR", "GROUP", "VAL", "ARRAY_OPEN", "ARRAY_CLOSE"],
+      "expectedPairs": [["GROUP", []]],
+      "notes": ["An empty group collection is present data, not an absent GROUP variable."]
+    },
+    {
+      "id": "group.unknown.fields",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 03 unknown-field fallback requirements.",
+        "sanitized": true
+      },
+      "description": "GROUP member records can include recognized status values and unknown fields.",
+      "coverage": ["group", "array", "table", "unknown-fields", "status", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms GROUP.",
+        "Session 03 requires controlled summaries for unknown member fields without claiming source schema."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "GROUP",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "member_name",
+        "VAL",
+        "Mystery Member",
+        "VAR",
+        "health",
+        "VAL",
+        "0",
+        "VAR",
+        "health_max",
+        "VAL",
+        "100",
+        "VAR",
+        "move",
+        "VAL",
+        "15",
+        "VAR",
+        "move_max",
+        "VAL",
+        "40",
+        "VAR",
+        "status",
+        "VAL",
+        "guarding",
+        "VAR",
+        "formation",
+        "VAL",
+        "front",
+        "VAR",
+        "note",
+        "VAL",
+        "synthetic unknown field",
+        "TABLE_CLOSE",
+        "ARRAY_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "GROUP",
+          [
+            {
+              "member_name": "Mystery Member",
+              "health": 0,
+              "health_max": 100,
+              "move": 15,
+              "move_max": 40,
+              "status": "guarding",
+              "formation": "front",
+              "note": "synthetic unknown field"
+            }
+          ]
+        ]
+      ],
+      "notes": [
+        "Unknown fields are synthetic and should be summarized conservatively by display code.",
+        "The zero health value must remain visible."
+      ]
+    },
+    {
+      "id": "group.object.payload",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from parser table behavior and conservative object-like GROUP fallback requirements.",
+        "sanitized": true
+      },
+      "description": "GROUP can be preserved as an object-like table of member records and raw entries.",
+      "coverage": ["group", "table", "object-like", "status", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms GROUP.",
+        "Session 03 requires conservative rendering for object-like GROUP payloads."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "GROUP",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "leader",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "NAME",
+        "VAL",
+        "Object Leader",
+        "VAR",
+        "LEADER",
+        "VAL",
+        "yes",
+        "VAR",
+        "HEALTH",
+        "VAL",
+        "55",
+        "VAR",
+        "HEALTH_MAX",
+        "VAL",
+        "50",
+        "VAR",
+        "MOVEMENT",
+        "VAL",
+        "20",
+        "VAR",
+        "MOVEMENT_MAX",
+        "VAL",
+        "0",
+        "VAR",
+        "STATUS",
+        "VAL",
+        "forming",
+        "TABLE_CLOSE",
+        "VAR",
+        "rawSlot",
+        "VAL",
+        "loose entry",
+        "TABLE_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "GROUP",
+          {
+            "leader": {
+              "NAME": "Object Leader",
+              "LEADER": "yes",
+              "HEALTH": 55,
+              "HEALTH_MAX": 50,
+              "MOVEMENT": 20,
+              "MOVEMENT_MAX": 0,
+              "STATUS": "forming"
+            },
+            "rawSlot": "loose entry"
+          }
+        ]
+      ],
+      "notes": [
+        "Top-level table keys are synthetic parser keys and not confirmed source member identifiers.",
+        "The raw string entry exists to verify conservative fallback display."
+      ]
+    }
+  ]
+}

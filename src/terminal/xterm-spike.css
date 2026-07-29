@@ -1,0 +1,43 @@
+.xterm-spike {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.xterm-spike-surface {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.xterm-spike .xterm {
+  width: 100%;
+  height: 100%;
+}
+
+.xterm-spike .xterm-viewport {
+  scrollbar-color: rgba(226, 232, 240, 0.35) transparent;
+}
+
+.xterm-spike .xterm-screen {
+  max-width: 100%;
+}
+
+.xterm-spike:focus-within {
+  outline: 2px solid rgba(45, 212, 191, 0.5);
+  outline-offset: -2px;
+}
+
+@media (max-width: 800px) {
+  .xterm-spike {
+    min-height: 18rem;
+  }
+
+  .xterm-spike-surface {
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "name": "luminariweb",
+  "private": true,
+  "version": "0.1.39",
+  "description": "First-party React and Node web MUD client for LuminariMUD-compatible games with an MSDP-driven HUD and WebSocket-to-Telnet proxy.",
+  "author": {
+    "name": "M. Ben Avraham",
+    "email": "moshehwebservices@live.com",
+    "url": "https://github.com/moshehbenavraham"
+  },
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuminariMUD/luminariweb.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LuminariMUD/luminariweb/issues"
+  },
+  "homepage": "https://web.luminarimud.com",
+  "keywords": [
+    "luminari",
+    "luminari-mud",
+    "mud",
+    "web-client",
+    "telnet",
+    "websocket",
+    "msdp",
+    "react",
+    "vite",
+    "typescript"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:client": "vite",
+    "dev:server": "node --watch --experimental-strip-types server/index.ts",
+    "build": "tsc -b && vite build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "preview": "vite preview",
+    "start": "node dist/server/index.js",
+    "media": "node scripts/process-onboarding-media.mjs",
+    "media:force": "node scripts/process-onboarding-media.mjs --force",
+    "dev:onboarding-preview": "node scripts/onboarding-preview-server.mjs",
+    "cloudflare:dev": "npm run build && wrangler dev",
+    "cloudflare:deploy": "npm run build && wrangler deploy",
+    "cloudflare:dry-run": "npm run build && wrangler deploy --dry-run",
+    "cloudflare:types": "wrangler types",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium"
+  },
+  "dependencies": {
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "ansi-to-html": "^0.7.2",
+    "express": "^5.1.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260727.1",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.0",
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.12.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^9.2.1",
+    "eslint": "^10.2.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.5.0",
+    "prettier": "^3.8.3",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.58.2",
+    "vite": "^8.0.10",
+    "wrangler": "^4.114.0"
+  }
+}

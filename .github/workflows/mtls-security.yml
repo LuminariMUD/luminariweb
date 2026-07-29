@@ -1,0 +1,297 @@
+name: mtls-security
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      force_alert:
+        description: Open transport and certificate issues to test alert delivery
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: mtls-security
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify production mutual TLS
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      CLIENT_CERTIFICATE: ops/certificates/luminari-web-worker-current.pem
+      EXPECTED_ORIGIN_IP: 74.208.126.44
+      FORCE_ALERT: ${{ github.event_name == 'workflow_dispatch' && inputs.force_alert || false }}
+      HEALTH_HOST: mud-status.luminarimud.com
+      ORIGIN_HOST: mud-origin.luminarimud.com
+      ORIGIN_PORT: '54443'
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Verify public TLS and mandatory client authentication
+        id: transport
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          resolved_addresses="$(
+            getent ahostsv4 "$ORIGIN_HOST" |
+              awk '{ print $1 }' |
+              sort -u
+          )"
+          grep -qx "$EXPECTED_ORIGIN_IP" <<<"$resolved_addresses"
+          test "$(wc -l <<<"$resolved_addresses")" -eq 1
+
+          health_addresses="$(
+            getent ahostsv4 "$HEALTH_HOST" |
+              awk '{ print $1 }' |
+              sort -u
+          )"
+          grep -qx "$EXPECTED_ORIGIN_IP" <<<"$health_addresses"
+          test "$(wc -l <<<"$health_addresses")" -eq 1
+
+          server_output="$RUNNER_TEMP/mtls-server-output.txt"
+          server_certificate="$RUNNER_TEMP/mtls-server-certificate.pem"
+          rejection_output="$RUNNER_TEMP/mtls-client-rejection.txt"
+          raw_output="$RUNNER_TEMP/mtls-raw-telnet.bin"
+          health_output="$RUNNER_TEMP/mtls-health.json"
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --max-time 15 \
+            "https://$HEALTH_HOST/mtls-health.json" \
+            --output "$health_output"
+          jq -e '
+            .status == "ok" and
+            .serverCertificate == "ok" and
+            .workerCertificate == "ok" and
+            .clientCaCertificate == "ok" and
+            .clientCrl == "ok" and
+            .handshakeStatus == "ok" and
+            (.handshakeFailures | type == "number") and
+            (.updatedAt | type == "number")
+          ' "$health_output" >/dev/null
+          health_age="$(( $(date -u +%s) - $(jq -r '.updatedAt' "$health_output") ))"
+          test "$health_age" -ge 0
+          test "$health_age" -le 2700
+
+          gateway_rejection="$RUNNER_TEMP/mtls-gateway-rejection.txt"
+          set +e
+          curl \
+            --silent \
+            --show-error \
+            --max-time 15 \
+            --http1.1 \
+            -H 'Connection: Upgrade' \
+            -H 'Upgrade: websocket' \
+            "https://$ORIGIN_HOST/gateway/ws" \
+            --output /dev/null \
+            2>"$gateway_rejection"
+          gateway_rejection_exit=$?
+          set -e
+          test "$gateway_rejection_exit" -ne 0
+          grep -qi 'certificate required' "$gateway_rejection"
+
+          timeout 15 openssl s_client \
+            -connect "$ORIGIN_HOST:$ORIGIN_PORT" \
+            -servername "$ORIGIN_HOST" \
+            -verify_hostname "$ORIGIN_HOST" \
+            -verify_return_error \
+            -CApath /etc/ssl/certs \
+            -showcerts \
+            </dev/null >"$server_output" 2>&1 || true
+
+          grep -q 'Verification: OK' "$server_output"
+          awk '
+            /-----BEGIN CERTIFICATE-----/ { capture = 1 }
+            capture { print }
+            /-----END CERTIFICATE-----/ { exit }
+          ' "$server_output" >"$server_certificate"
+          openssl x509 -in "$server_certificate" -noout -checkhost "$ORIGIN_HOST"
+
+          set +e
+          printf 'invented-no-client-probe\n' |
+            timeout 15 openssl s_client \
+              -quiet \
+              -connect "$ORIGIN_HOST:$ORIGIN_PORT" \
+              -servername "$ORIGIN_HOST" \
+              -verify_hostname "$ORIGIN_HOST" \
+              -verify_return_error \
+              -CApath /etc/ssl/certs \
+              >"$rejection_output" 2>&1
+          rejection_exit=$?
+          set -e
+
+          test "$rejection_exit" -ne 0
+          grep -qi 'certificate required' "$rejection_output"
+          if strings "$rejection_output" | grep -Eqi '(welcome to|account name|password:)'; then
+            echo 'Unauthenticated TLS received MUD application data.' >&2
+            exit 1
+          fi
+
+          timeout 5 bash -c \
+            "exec 3<>/dev/tcp/$EXPECTED_ORIGIN_IP/$ORIGIN_PORT; \
+             printf 'invented-raw-telnet-probe\\r\\n' >&3; \
+             head -c 128 <&3" \
+            >"$raw_output" 2>/dev/null || true
+          if strings "$raw_output" | grep -Eqi '(welcome to|account name|password:|luminari)'; then
+            echo 'Raw Telnet reached the MUD through the TLS listener.' >&2
+            exit 1
+          fi
+
+          if [[ "$FORCE_ALERT" == 'true' ]]; then
+            echo 'Forced alert requested for end-to-end notification testing.' >&2
+            exit 99
+          fi
+
+      - name: Calculate certificate thresholds
+        id: expiry
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          server_certificate="$RUNNER_TEMP/mtls-server-certificate.pem"
+          if [[ ! -s "$server_certificate" ]]; then
+            echo 'severity=unknown' >>"$GITHUB_OUTPUT"
+            echo 'summary=The server certificate could not be inspected.' >>"$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          remaining_days() {
+            local certificate=$1
+            local expires
+            local expiry_epoch
+            local now_epoch
+            expires="$(openssl x509 -in "$certificate" -noout -enddate | cut -d= -f2-)"
+            expiry_epoch="$(date -u -d "$expires" +%s)"
+            now_epoch="$(date -u +%s)"
+            echo $(((expiry_epoch - now_epoch) / 86400))
+          }
+
+          server_days="$(remaining_days "$server_certificate")"
+          client_days="$(remaining_days "$CLIENT_CERTIFICATE")"
+          severity=ok
+
+          for days in "$server_days" "$client_days"; do
+            if (( days < 0 )); then
+              severity=expired
+              break
+            elif (( days <= 7 )); then
+              severity=7-day
+            elif (( days <= 14 )) && [[ "$severity" == 'ok' || "$severity" == '30-day' ]]; then
+              severity=14-day
+            elif (( days <= 30 )) && [[ "$severity" == 'ok' ]]; then
+              severity=30-day
+            fi
+          done
+
+          if [[ "$FORCE_ALERT" == 'true' ]]; then
+            severity=30-day
+            server_days='forced-alert'
+            client_days='forced-alert'
+          fi
+
+          echo "severity=$severity" >>"$GITHUB_OUTPUT"
+          echo "summary=Server certificate: ${server_days} days; Worker certificate: ${client_days} days." >>"$GITHUB_OUTPUT"
+
+      - name: Open transport alert issue
+        if: steps.transport.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          title='[mTLS alert] Production transport security check failed'
+          existing="$(
+            gh issue list \
+              --state open \
+              --search '"Production transport security check failed" in:title' \
+              --json number \
+              --jq '.[0].number // empty'
+          )"
+          if [[ -z "$existing" ]]; then
+            gh issue create \
+              --title "$title" \
+              --body "The scheduled mutual-TLS transport gate failed. No player content was collected. Inspect run: $RUN_URL"
+          fi
+
+      - name: Close recovered transport alert
+        if: steps.transport.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue list \
+            --state open \
+            --search '"Production transport security check failed" in:title' \
+            --json number \
+            --jq '.[].number' |
+            while read -r issue; do
+              gh issue close "$issue" --comment 'The production mutual-TLS transport gate has recovered.'
+            done
+
+      - name: Open certificate expiry alert issue
+        if: steps.expiry.outputs.severity != 'ok'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SEVERITY: ${{ steps.expiry.outputs.severity }}
+          SUMMARY: ${{ steps.expiry.outputs.summary }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          title='[mTLS alert] Certificate expiry threshold reached'
+          existing="$(
+            gh issue list \
+              --state open \
+              --search '"Certificate expiry threshold reached" in:title' \
+              --json number \
+              --jq '.[0].number // empty'
+          )"
+          if [[ -z "$existing" ]]; then
+            gh issue create \
+              --title "$title" \
+              --body "Threshold: $SEVERITY. $SUMMARY No private key material is present. Inspect run: $RUN_URL"
+          fi
+
+      - name: Close recovered certificate alert
+        if: steps.expiry.outputs.severity == 'ok'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue list \
+            --state open \
+            --search '"Certificate expiry threshold reached" in:title' \
+            --json number \
+            --jq '.[].number' |
+            while read -r issue; do
+              gh issue close "$issue" --comment 'Both production mutual-TLS certificates are outside the 30-day warning window.'
+            done
+
+      - name: Enforce the security gate
+        if: always()
+        env:
+          EXPIRY_SEVERITY: ${{ steps.expiry.outputs.severity }}
+          TRANSPORT_OUTCOME: ${{ steps.transport.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$TRANSPORT_OUTCOME" == 'success' ]]
+          [[ "$EXPIRY_SEVERITY" == 'ok' ]]

@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 1,
+  "fixtureFile": "combat-and-resources",
+  "description": "Resource, experience, combat, tank, position, money, and practice fixtures.",
+  "fixtures": [
+    {
+      "id": "combat.resources.current",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from PRD source protocol facts for confirmed resource MSDP variables.",
+        "sanitized": true
+      },
+      "description": "Current and maximum resource values parse as normalized numbers.",
+      "coverage": ["resources", "scalar", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms HEALTH, HEALTH_MAX, PSP, PSP_MAX, MOVEMENT, and MOVEMENT_MAX."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "HEALTH",
+        "VAL",
+        "83",
+        "VAR",
+        "HEALTH_MAX",
+        "VAL",
+        "120",
+        "VAR",
+        "PSP",
+        "VAL",
+        "34",
+        "VAR",
+        "PSP_MAX",
+        "VAL",
+        "44",
+        "VAR",
+        "MOVEMENT",
+        "VAL",
+        "91",
+        "VAR",
+        "MOVEMENT_MAX",
+        "VAL",
+        "110"
+      ],
+      "expectedPairs": [
+        ["HEALTH", 83],
+        ["HEALTH_MAX", 120],
+        ["PSP", 34],
+        ["PSP_MAX", 44],
+        ["MOVEMENT", 91],
+        ["MOVEMENT_MAX", 110]
+      ],
+      "notes": ["Values are synthetic but within normal parser scalar ranges."]
+    },
+    {
+      "id": "combat.experience.progression",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from PRD source protocol facts for confirmed experience MSDP variables.",
+        "sanitized": true
+      },
+      "description": "Experience totals and experience to next level parse as normalized numbers.",
+      "coverage": ["experience", "scalar", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms EXPERIENCE, EXPERIENCE_MAX, and EXPERIENCE_TNL."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "EXPERIENCE",
+        "VAL",
+        "451200",
+        "VAR",
+        "EXPERIENCE_MAX",
+        "VAL",
+        "500000",
+        "VAR",
+        "EXPERIENCE_TNL",
+        "VAL",
+        "48800"
+      ],
+      "expectedPairs": [
+        ["EXPERIENCE", 451200],
+        ["EXPERIENCE_MAX", 500000],
+        ["EXPERIENCE_TNL", 48800]
+      ],
+      "notes": [
+        "This fixture keeps progression values as plain integers for deterministic parser assertions."
+      ]
+    },
+    {
+      "id": "combat.opponent.and.tank",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from PRD source protocol facts for confirmed combat and tank MSDP variables.",
+        "sanitized": true
+      },
+      "description": "Opponent and tank status values parse as mixed strings and normalized numbers.",
+      "coverage": ["combat", "tank", "scalar", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ATTACK_BONUS, AC, OPPONENT_NAME, OPPONENT_HEALTH, OPPONENT_HEALTH_MAX, TANK_NAME, TANK_HEALTH, and TANK_HEALTH_MAX.",
+        "DAMAGE_BONUS is excluded because Session 02 demoted it to override-only until live emission is reliable."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "OPPONENT_NAME",
+        "VAL",
+        "training dummy",
+        "VAR",
+        "OPPONENT_HEALTH",
+        "VAL",
+        "25",
+        "VAR",
+        "OPPONENT_HEALTH_MAX",
+        "VAL",
+        "100",
+        "VAR",
+        "TANK_NAME",
+        "VAL",
+        "Shield Ally",
+        "VAR",
+        "TANK_HEALTH",
+        "VAL",
+        "80",
+        "VAR",
+        "TANK_HEALTH_MAX",
+        "VAL",
+        "100",
+        "VAR",
+        "ATTACK_BONUS",
+        "VAL",
+        "7",
+        "VAR",
+        "AC",
+        "VAL",
+        "-4"
+      ],
+      "expectedPairs": [
+        ["OPPONENT_NAME", "training dummy"],
+        ["OPPONENT_HEALTH", 25],
+        ["OPPONENT_HEALTH_MAX", 100],
+        ["TANK_NAME", "Shield Ally"],
+        ["TANK_HEALTH", 80],
+        ["TANK_HEALTH_MAX", 100],
+        ["ATTACK_BONUS", 7],
+        ["AC", -4]
+      ],
+      "notes": ["Combat names are generic synthetic labels."]
+    },
+    {
+      "id": "combat.opponent.partial.zero",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 02 partial combat display requirements.",
+        "sanitized": true
+      },
+      "description": "Opponent and tank values can arrive without matching maximum values, preserving zero current health.",
+      "coverage": ["combat", "tank", "partial-data", "scalar", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms OPPONENT_NAME, OPPONENT_HEALTH, TANK_NAME, and TANK_HEALTH.",
+        "Session 02 requires partial combat values to render without clearing unrelated state."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "OPPONENT_NAME",
+        "VAL",
+        "sparring shade",
+        "VAR",
+        "OPPONENT_HEALTH",
+        "VAL",
+        "0",
+        "VAR",
+        "TANK_NAME",
+        "VAL",
+        "Front Line",
+        "VAR",
+        "TANK_HEALTH",
+        "VAL",
+        "50"
+      ],
+      "expectedPairs": [
+        ["OPPONENT_NAME", "sparring shade"],
+        ["OPPONENT_HEALTH", 0],
+        ["TANK_NAME", "Front Line"],
+        ["TANK_HEALTH", 50]
+      ],
+      "notes": [
+        "Missing maximum values are intentional so display helpers can test partial health handling."
+      ]
+    },
+    {
+      "id": "combat.empty.names",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 02 empty combat display requirements.",
+        "sanitized": true
+      },
+      "description": "Blank opponent and tank names remain explicit empty values.",
+      "coverage": ["combat", "tank", "empty-values", "scalar"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms OPPONENT_NAME and TANK_NAME.",
+        "Session 02 requires empty combat state to stay quiet and non-alarming."
+      ],
+      "payloadTokens": ["VAR", "OPPONENT_NAME", "VAL", "", "VAR", "TANK_NAME", "VAL", ""],
+      "expectedPairs": [
+        ["OPPONENT_NAME", ""],
+        ["TANK_NAME", ""]
+      ],
+      "notes": ["Blank names are synthetic and are not live player data."]
+    },
+    {
+      "id": "combat.position.money.practice",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from PRD source protocol facts for confirmed character economy and position variables.",
+        "sanitized": true
+      },
+      "description": "Position, money, practice, and alignment parse as expected scalar values.",
+      "coverage": ["position", "money", "practice", "character", "scalar", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms POSITION, ALIGNMENT, MONEY, and PRACTICE."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "POSITION",
+        "VAL",
+        "fighting",
+        "VAR",
+        "MONEY",
+        "VAL",
+        "12345",
+        "VAR",
+        "PRACTICE",
+        "VAL",
+        "3",
+        "VAR",
+        "ALIGNMENT",
+        "VAL",
+        "lawful neutral"
+      ],
+      "expectedPairs": [
+        ["POSITION", "fighting"],
+        ["MONEY", 12345],
+        ["PRACTICE", 3],
+        ["ALIGNMENT", "lawful neutral"]
+      ],
+      "notes": [
+        "This fixture supports later state-mapping tests for distinguishing zero-like numeric values from missing data."
+      ]
+    }
+  ]
+}

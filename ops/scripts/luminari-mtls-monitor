@@ -1,0 +1,172 @@
+#!/bin/bash
+set -euo pipefail
+
+state_dir=/var/lib/luminari-mtls-monitor
+status_dir=/var/lib/luminari-status
+alert=/usr/local/sbin/luminari-mtls-alert
+pki_dir=/root/luminari-mtls-pki
+worker_certificate=$pki_dir/worker-current.crt
+worker_key=$pki_dir/worker-current.key
+installed_crl=/etc/stunnel/luminari-worker-client-crl.pem
+declare -A certificate_levels
+
+fail() {
+    printf "ERROR: %s\n" "$1" >&2
+    exit 1
+}
+
+record_level() {
+    local label=$1
+    local level=$2
+    local detail=$3
+    local state_file="$state_dir/$label.level"
+    local previous=unknown
+
+    if [[ -r "$state_file" ]]; then
+        previous=$(<"$state_file")
+    fi
+
+    printf "%s\n" "$level" >"$state_file"
+    if [[ "$level" != ok && "$level" != "$previous" ]]; then
+        "$alert" "$label-$level" "$detail"
+    fi
+}
+
+check_certificate() {
+    local label=$1
+    local path=$2
+    local level=ok
+
+    if ! openssl x509 -in "$path" -noout -checkend 0 >/dev/null; then
+        level=expired
+    elif ! openssl x509 -in "$path" -noout -checkend 604800 >/dev/null; then
+        level=7-day
+    elif ! openssl x509 -in "$path" -noout -checkend 1209600 >/dev/null; then
+        level=14-day
+    elif ! openssl x509 -in "$path" -noout -checkend 2592000 >/dev/null; then
+        level=30-day
+    fi
+
+    local expiry
+    expiry=$(openssl x509 -in "$path" -noout -enddate | cut -d= -f2-)
+    certificate_levels["$label"]=$level
+    record_level "$label" "$level" "$label expires at $expiry (threshold $level)."
+    printf "%s=%s expiry=%s\n" "$label" "$level" "$expiry"
+}
+
+install -d -m 0700 "$state_dir"
+install -d -m 0755 -o root -g www-data "$status_dir"
+
+systemctl is-active --quiet stunnel@luminari-mud.service ||
+    fail "stunnel service is not active"
+systemctl is-active --quiet apache2.service ||
+    fail "Apache service is not active"
+systemctl is-active --quiet luminari-web-gateway.service ||
+    fail "loopback gateway service is not active"
+systemctl is-active --quiet certbot.timer ||
+    fail "Certbot renewal timer is not active"
+systemctl is-active --quiet luminari-mtls-crl.timer ||
+    fail "client CRL refresh timer is not active"
+
+ss -ltnH "sport = :54443" | grep -q . ||
+    fail "TLS listener 54443 is absent"
+ss -ltnH "sport = :5191" | grep -q "127.0.0.1:" ||
+    fail "loopback gateway listener 5191 is absent"
+getent ahostsv4 mud-origin.luminarimud.com |
+    awk "{print \$1}" |
+    grep -qx 74.208.126.44 ||
+    fail "origin DNS does not resolve to the intended host"
+
+[[ $(stat -c "%a:%U:%G" /etc/stunnel/luminari-server/privkey.pem) == 640:root:stunnel4 ]] ||
+    fail "server key permissions changed"
+[[ $(stat -c "%a:%U:%G" "$pki_dir/client-ca.key") == 600:root:root ]] ||
+    fail "client CA key permissions changed"
+[[ $(stat -L -c "%a:%U:%G" "$worker_key") == 600:root:root ]] ||
+    fail "Worker key permissions changed"
+
+openssl verify \
+    -purpose sslclient \
+    -CAfile "$pki_dir/client-ca.crt" \
+    -crl_check \
+    -CRLfile "$installed_crl" \
+    "$worker_certificate" \
+    >/dev/null ||
+    fail "Worker certificate verification failed"
+
+check_certificate server-certificate /etc/stunnel/luminari-server/fullchain.pem
+check_certificate worker-certificate "$worker_certificate"
+check_certificate client-ca-certificate "$pki_dir/client-ca.crt"
+
+crl_next=$(openssl crl -in "$installed_crl" -noout -nextupdate | cut -d= -f2-)
+crl_epoch=$(date -u -d "$crl_next" +%s)
+now_epoch=$(date -u +%s)
+crl_level=ok
+
+if ((crl_epoch <= now_epoch)); then
+    crl_level=expired
+    record_level client-crl "$crl_level" "The Worker client CRL expired at $crl_next."
+elif ((crl_epoch - now_epoch <= 604800)); then
+    crl_level=7-day
+    record_level client-crl "$crl_level" "The Worker client CRL expires at $crl_next."
+else
+    record_level client-crl "$crl_level" "The Worker client CRL is current."
+fi
+
+failures=$(
+    journalctl \
+        -u stunnel@luminari-mud.service \
+        --since "15 minutes ago" \
+        --no-pager |
+        grep -c "SSL_accept:" ||
+        true
+)
+handshake_level=ok
+
+if ((failures >= 20)); then
+    handshake_level=spike
+    record_level \
+        handshake-failures \
+        "$handshake_level" \
+        "Observed $failures failed TLS handshakes in 15 minutes."
+else
+    record_level \
+        handshake-failures \
+        "$handshake_level" \
+        "Handshake failure rate is normal."
+fi
+
+monitor_status=ok
+for level in "${certificate_levels[@]}" "$crl_level" "$handshake_level"; do
+    if [[ "$level" != ok ]]; then
+        monitor_status=alert
+    fi
+done
+
+health_tmp=$(mktemp "$state_dir/mtls-health.XXXXXX")
+jq -n \
+    --arg status "$monitor_status" \
+    --arg serverCertificate "${certificate_levels[server-certificate]}" \
+    --arg workerCertificate "${certificate_levels[worker-certificate]}" \
+    --arg clientCaCertificate "${certificate_levels[client-ca-certificate]}" \
+    --arg clientCrl "$crl_level" \
+    --arg handshakeStatus "$handshake_level" \
+    --argjson handshakeFailures "$failures" \
+    --argjson updatedAt "$now_epoch" \
+    '{
+        status: $status,
+        updatedAt: $updatedAt,
+        serverCertificate: $serverCertificate,
+        workerCertificate: $workerCertificate,
+        clientCaCertificate: $clientCaCertificate,
+        clientCrl: $clientCrl,
+        handshakeStatus: $handshakeStatus,
+        handshakeFailures: $handshakeFailures
+    }' >"$health_tmp"
+install -m 0644 -o root -g www-data "$health_tmp" "$status_dir/mtls-health.json"
+find "$health_tmp" -maxdepth 0 -type f -delete
+
+printf \
+    "client-crl expiry=%s\nhandshake-failures=%s\nmonitor=%s\n" \
+    "$crl_next" \
+    "$failures" \
+    "$monitor_status"

@@ -1,0 +1,29 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "luminari-web",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-07-28",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "mtls_certificates": [
+    {
+      "binding": "MUD_ORIGIN_MTLS",
+      "certificate_id": "6015b318-1e10-4584-aa26-6673afd1e5d4",
+    },
+  ],
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "web.luminarimud.com",
+      "custom_domain": true,
+    },
+  ],
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/health", "/api/*", "/ws"],
+  },
+  "observability": {
+    "enabled": false,
+  },
+}

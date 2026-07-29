@@ -1,0 +1,29 @@
+#!/bin/sh
+set -eu
+
+umask 077
+
+pki_dir=/root/luminari-mtls-pki
+source_crl=$pki_dir/client-ca.crl
+installed_crl=/etc/stunnel/luminari-worker-client-crl.pem
+temporary_crl=$(mktemp "$pki_dir/client-ca.crl.XXXXXX")
+
+cleanup() {
+    find "$temporary_crl" -maxdepth 0 -type f -delete
+}
+trap cleanup EXIT HUP INT TERM
+
+openssl ca \
+    -batch \
+    -config "$pki_dir/openssl.cnf" \
+    -gencrl \
+    -out "$temporary_crl" \
+    >/dev/null
+openssl crl -in "$temporary_crl" -noout -nextupdate >/dev/null
+apache2ctl configtest >/dev/null
+
+install -m 0644 -o root -g root "$temporary_crl" "$source_crl"
+install -m 0644 -o root -g root "$temporary_crl" "$installed_crl"
+
+systemctl reload apache2.service
+systemctl reload stunnel@luminari-mud.service

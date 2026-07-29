@@ -1,0 +1,710 @@
+{
+  "schema": "luminari.onboarding.media-metadata/1",
+  "note": "Authored presentation metadata merged into the generated media manifest. Alt text is written for the screen context, not as a description of the file. Decorative assets use empty alt text and set \"decorative\": true.",
+  "assets": {
+    "scene/arrival": {
+      "alt": "A traveller's view of Ashenport at blue hour, harbour lights burning below distant towers.",
+      "accent": "#2b4a6f",
+      "preload": "eager",
+      "provenance": "gen/scene-arrival-v1"
+    },
+    "scene/authentication": {
+      "alt": "A sheltered gatehouse waystation lit by a single lantern.",
+      "accent": "#2a3a52",
+      "preload": "eager",
+      "provenance": "gen/scene-authentication-v1"
+    },
+    "scene/account-lobby": {
+      "alt": "A warm guild hall hung with the banners of returning adventurers.",
+      "accent": "#4a3524",
+      "preload": "eager",
+      "provenance": "gen/scene-account-lobby-v1"
+    },
+    "scene/identity": {
+      "alt": "A quiet scriptorium with a blank ledger, quill, and lamplight.",
+      "accent": "#3d3427",
+      "preload": "lazy",
+      "provenance": "gen/scene-identity-v1"
+    },
+    "scene/race-gallery": {
+      "alt": "A neutral hall of origins ringed with empty plinths awaiting a chosen ancestry.",
+      "accent": "#2f3b46",
+      "preload": "lazy",
+      "provenance": "gen/scene-race-gallery-v1"
+    },
+    "scene/class-gallery": {
+      "alt": "A hall of paths where armoury, library, shrine, and workshop meet under one roof.",
+      "accent": "#33333f",
+      "preload": "lazy",
+      "provenance": "gen/scene-class-gallery-v1"
+    },
+    "scene/build-alignment": {
+      "alt": "A celestial loom chamber whose floor is marked with nine readable positions.",
+      "accent": "#3a2f4d",
+      "preload": "lazy",
+      "provenance": "gen/scene-build-alignment-v1"
+    },
+    "scene/roleplay": {
+      "alt": "A quiet writing chamber with a map table, open journal, and keepsakes.",
+      "accent": "#40342a",
+      "preload": "lazy",
+      "provenance": "gen/scene-roleplay-v1"
+    },
+    "scene/handoff": {
+      "alt": "An open threshold gate leading out of the creation halls into the wider world.",
+      "accent": "#4a4028",
+      "preload": "lazy",
+      "provenance": "gen/scene-handoff-v1"
+    },
+    "race/fallback": {
+      "alt": "An unlit silhouette standing in for an ancestry with no artwork yet.",
+      "accent": "#39404a"
+    },
+    "class/fallback": {
+      "alt": "An unmarked silhouette standing in for a path with no artwork yet.",
+      "accent": "#3c3a44"
+    },
+    "shared/character-fallback": {
+      "alt": "An anonymous adventurer silhouette used when character art is unavailable.",
+      "accent": "#343a42"
+    },
+    "background/fallback": {
+      "alt": "A blank journal closed with an unmarked wax seal.",
+      "accent": "#4a4132"
+    },
+    "region/fallback": {
+      "alt": "An uncharted landscape marked only with a plain map pin.",
+      "accent": "#3f4638"
+    },
+    "faction/fallback": {
+      "alt": "An unmarked banner hanging beside a plain shield.",
+      "accent": "#43373a"
+    },
+    "hometown/fallback": {
+      "alt": "A distant settlement silhouette on an unnamed horizon.",
+      "accent": "#3a4048"
+    },
+    "deity/fallback": {
+      "alt": "An unrecognised shrine holding an empty holy-symbol frame.",
+      "accent": "#3d3a4a"
+    },
+    "shared/texture-parchment": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/texture-dark-stone": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/texture-brushed-metal": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/texture-woven-cloth": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/texture-aged-map": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/texture-arcane-glass": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/motes-dust": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/motes-arcane": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/embers": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/stars": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/fog-far": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/fog-near": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/light-rays": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/ink-bloom": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/rune-ring": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/frame-ornament": {
+      "alt": "",
+      "decorative": true
+    },
+    "shared/card-rune-border": {
+      "alt": "",
+      "decorative": true
+    },
+    "brand/luminari-primary": {
+      "alt": "Luminari",
+      "accent": "#c8a24a",
+      "preload": "eager"
+    },
+    "brand/luminari-mark": {
+      "alt": "Luminari",
+      "accent": "#c8a24a",
+      "preload": "eager"
+    },
+    "brand/luminari-seal": {
+      "alt": "",
+      "decorative": true
+    },
+    "brand/loading-sigil": {
+      "alt": "",
+      "decorative": true
+    },
+    "account/connecting": {
+      "alt": "A closed gate with an unlit sigil.",
+      "accent": "#2c3340"
+    },
+    "account/connected": {
+      "alt": "A gate sigil lit to show a network connection.",
+      "accent": "#2f4a44"
+    },
+    "account/reconnecting": {
+      "alt": "A gate sigil relighting after a dropped link.",
+      "accent": "#3f3a2c"
+    },
+    "account/disconnected": {
+      "alt": "A dormant gate with a clear path back.",
+      "accent": "#33303a"
+    },
+    "account/classic-terminal": {
+      "alt": "",
+      "decorative": true
+    },
+    "account/new-account": {
+      "alt": "A blank account ledger beside an unused seal.",
+      "accent": "#443a2c"
+    },
+    "account/empty-lobby": {
+      "alt": "An empty display plinth waiting for a first character.",
+      "accent": "#3a3a44"
+    },
+    "account/full-lobby": {
+      "alt": "A full archive shelf with no room for another folio.",
+      "accent": "#463830"
+    },
+    "account/link-character": {
+      "alt": "Two seals joined by a single ribbon.",
+      "accent": "#3c3446"
+    },
+    "account/character-card-frame": {
+      "alt": "",
+      "decorative": true
+    },
+    "account/private-input": {
+      "alt": "",
+      "decorative": true
+    },
+    "account/motd-frame": {
+      "alt": "",
+      "decorative": true
+    },
+    "account/selected-character-menu": {
+      "alt": "",
+      "decorative": true
+    },
+    "identity/name": {
+      "alt": "A blank nameplate resting beside a quill and warm wax.",
+      "accent": "#463c2a"
+    },
+    "identity/name-confirmed": {
+      "alt": "A nameplate closed with a pressed seal.",
+      "accent": "#4a3c24"
+    },
+    "identity/sex-male": {
+      "alt": "An abstract emblem marking the male identity choice.",
+      "accent": "#33445c"
+    },
+    "identity/sex-female": {
+      "alt": "An abstract emblem marking the female identity choice.",
+      "accent": "#4d3550"
+    },
+    "build/premade": {
+      "alt": "A completed map and a packed kit, ready to travel.",
+      "accent": "#3f4630"
+    },
+    "build/custom": {
+      "alt": "Open tools and a branching plan laid out for assembly.",
+      "accent": "#2f4650"
+    },
+    "build/compare": {
+      "alt": "Two paths diverging from a single trailhead.",
+      "accent": "#3a3f48"
+    },
+    "alignment/compass": {
+      "alt": "",
+      "decorative": true,
+      "provenance": "gen/alignment-seals-v1"
+    },
+    "alignment/lawful-good": {
+      "alt": "The seal of lawful good.",
+      "accent": "#4a4526",
+      "provenance": "gen/alignment-seals-v1"
+    },
+    "alignment/neutral-good": {
+      "alt": "The seal of neutral good.",
+      "accent": "#3f4a34",
+      "provenance": "gen/alignment-seals-v1"
+    },
+    "alignment/chaotic-good": {
+      "alt": "The seal of chaotic good.",
+      "accent": "#3a4a48",
+      "provenance": "gen/alignment-seals-v1"
+    },
+    "alignment/lawful-neutral": {
+      "alt": "The seal of lawful neutral.",
+      "accent": "#3f4048",
+      "provenance": "gen/alignment-seals-v1"
+    },
+    "alignment/true-neutral": {
+      "alt": "The seal of true neutral.",
+      "accent": "#3d3d3d",
+      "provenance": "gen/alignment-seals-v1"
+    },
+    "alignment/chaotic-neutral": {
+      "alt": "The seal of chaotic neutral.",
+      "accent": "#3a3848",
+      "provenance": "gen/alignment-seals-v1"
+    },
+    "alignment/lawful-evil": {
+      "alt": "The seal of lawful evil.",
+      "accent": "#4a3430",
+      "provenance": "gen/alignment-seals-v1"
+    },
+    "alignment/neutral-evil": {
+      "alt": "The seal of neutral evil.",
+      "accent": "#43302f",
+      "provenance": "gen/alignment-seals-v1"
+    },
+    "alignment/chaotic-evil": {
+      "alt": "The seal of chaotic evil.",
+      "accent": "#48282c",
+      "provenance": "gen/alignment-seals-v1"
+    },
+    "preferences/recommended": {
+      "alt": "A coherent adventuring kit packed and fastened.",
+      "accent": "#3d4232"
+    },
+    "preferences/manual": {
+      "alt": "The same kit laid out so each piece can be chosen individually.",
+      "accent": "#39404a"
+    },
+    "roleplay/choice-roleplayer": {
+      "alt": "An open journal and a personal keepsake.",
+      "accent": "#43382c"
+    },
+    "roleplay/choice-non-roleplayer": {
+      "alt": "A direct road leading straight into open country.",
+      "accent": "#3a4238"
+    },
+    "roleplay/choice-later": {
+      "alt": "A journal held open at a bookmarked page.",
+      "accent": "#3e3a30"
+    },
+    "roleplay/core-summary": {
+      "alt": "",
+      "decorative": true
+    },
+    "roleplay/profile-hub": {
+      "alt": "A character-options desk with clearly separated symbolic slots.",
+      "accent": "#41372c"
+    },
+    "roleplay/short-description": {
+      "alt": "A shadowed profile beside a set of blank description fields."
+    },
+    "roleplay/long-description": {
+      "alt": "A full blank character folio bordered with empty portrait and detail spaces."
+    },
+    "roleplay/background-story": {
+      "alt": "An open blank journal waiting beside a lantern and travel-worn books."
+    },
+    "roleplay/goals": {
+      "alt": "A winding map path climbing toward a distant star-lit summit."
+    },
+    "roleplay/personality": {
+      "alt": "Several reflected expressions joined in one fractured mirror."
+    },
+    "roleplay/ideals": {
+      "alt": "A traveller considering a small guiding flame beneath a bright star."
+    },
+    "roleplay/bonds": {
+      "alt": "Keys, keepsakes, and linked cords laid together on a map."
+    },
+    "roleplay/flaws": {
+      "alt": "A dark silhouette reflected across the repaired fractures of a mirror."
+    },
+    "age/adolescent": {
+      "alt": "A young traveller beginning a lamplit path beneath a moonlit tree."
+    },
+    "age/adult": {
+      "alt": "An adult traveller standing ready beneath a broad celestial compass."
+    },
+    "age/middle-aged": {
+      "alt": "A mature traveller surveying a mountain road beside a weathered compass."
+    },
+    "age/old-aged": {
+      "alt": "An older traveller carrying a lantern along a high moonlit path."
+    },
+    "age/venerable": {
+      "alt": "A venerable traveller raising a staff beneath an arc of stars."
+    },
+    "background/acolyte": {
+      "alt": "A robed temple attendant studying by candlelight."
+    },
+    "background/charlatan": {
+      "alt": "A theatrical mask, potion vial, and marked cards arranged for a practiced deception."
+    },
+    "background/criminal-spy": {
+      "alt": "A coded parchment and lock tools spread across a hidden worktable."
+    },
+    "background/entertainer": {
+      "alt": "Masks, instruments, and stage props gathered beneath a single spotlight."
+    },
+    "background/folk-hero": {
+      "alt": "A humble village medallion resting on a weathered cloak."
+    },
+    "background/gladiator": {
+      "alt": "A plumed arena helm surrounded by weapons and sand."
+    },
+    "background/hermit": {
+      "alt": "A solitary scholar working by lantern light inside a rocky shelter."
+    },
+    "background/noble": {
+      "alt": "An illuminated estate ledger with signets and a civic seal."
+    },
+    "background/outlander": {
+      "alt": "A traveller's cloak, bow, and wilderness kit overlooking a distant settlement."
+    },
+    "background/pirate": {
+      "alt": "A weathered sea chart among ropes beneath a stormy horizon."
+    },
+    "background/sage": {
+      "alt": "An open research volume surrounded by maps, instruments, and a glowing crystal."
+    },
+    "background/sailor": {
+      "alt": "Working rope, a jug, and ship fittings beside a busy harbour."
+    },
+    "background/soldier": {
+      "alt": "A campaign banner, helm, and maintained field kit."
+    },
+    "background/squire": {
+      "alt": "Polished armour, shield, and training sword arranged for service."
+    },
+    "background/trader": {
+      "alt": "Balanced scales, a trade ledger, and carefully measured goods."
+    },
+    "background/urchin": {
+      "alt": "A small travelling pack left on a moonlit rooftop route."
+    },
+    "region/luminari-world-map": {
+      "alt": "A painted map of Luminari's islands and continents encircled by deep blue seas."
+    },
+    "region/ashenport": {
+      "alt": "Ashenport's sprawling harbour glowing with lanterns at blue hour."
+    },
+    "region/sanctus": {
+      "alt": "A sunlit marble city rising in terraces above a crowded blue harbour."
+    },
+    "region/onduis": {
+      "alt": "A green lake basin dotted with old towers beneath distant mountains."
+    },
+    "region/selerish": {
+      "alt": "Green coastal islands and quiet settlements spread beneath a clearing sky."
+    },
+    "region/carstan": {
+      "alt": "A pale-spired city built along high cliffs above a cold sea."
+    },
+    "region/axtros": {
+      "alt": "A volcanic coastline of red cliffs, dark forests, and a distant mountain citadel."
+    },
+    "region/hir": {
+      "alt": "A broad forested valley and river city opening toward snow-capped peaks."
+    },
+    "region/quechian": {
+      "alt": "An immense ancient tree sheltering a cliffside settlement above the clouds."
+    },
+    "region/vailand": {
+      "alt": "A dark mountain valley crossed by old roads beneath a red-lit spire."
+    },
+    "region/oorpii": {
+      "alt": "A river canyon descending through green highlands to a sheltered coast."
+    },
+    "region/kellust": {
+      "alt": "A rune-carved mountain hall overlooking a snowy highland valley."
+    },
+    "region/east-ubdina": {
+      "alt": "A fortified settlement clinging to snowy cliffs and red stone canyons."
+    },
+    "region/west-ubdina": {
+      "alt": "A high fortress above a frozen waterfall in a windswept mountain basin."
+    },
+    "faction/adventurer": {
+      "alt": "An unclaimed travel banner beside a lone campfire under the open night sky."
+    },
+    "faction/pyrets-pirates": {
+      "alt": "A weathered pirate banner flying above a moonlit ship and its armed crew."
+    },
+    "hometown/ashenport": {
+      "alt": "Ashenport's busy market quays beneath lantern-lit houses and harbour towers."
+    },
+    "deity/none": {
+      "alt": "A plain stone resting in an open shrine with no holy symbol."
+    },
+    "deity/aethyra": {
+      "alt": "A silver spindle of coloured lights suspended above a ritual bowl."
+    },
+    "deity/nethris": {
+      "alt": "A black key and pale carved wing set into a quiet memorial stone."
+    },
+    "deity/seraphine": {
+      "alt": "A radiant golden sun disc surrounded by grain and harvest fruit."
+    },
+    "deity/kaelthir": {
+      "alt": "An eight-pointed star chart standing between an hourglass and old books."
+    },
+    "deity/pyrion": {
+      "alt": "A white spiral flame rising from a dark ceremonial brazier."
+    },
+    "deity/vaelith": {
+      "alt": "A spiral shell shrine lit by lightning above a storm-tossed sea."
+    },
+    "deity/orith": {
+      "alt": "A rune-carved standing stone before enduring mountain peaks."
+    },
+    "deity/aerion": {
+      "alt": "A white spiral of wind carrying feathers above a brass spyglass."
+    },
+    "deity/kordran": {
+      "alt": "A radiant warhammer resting against a sun-marked shield and battle standards."
+    },
+    "deity/thalos": {
+      "alt": "Balanced bronze scales standing among law books and sealed records."
+    },
+    "deity/lumerion": {
+      "alt": "A warm hanging lantern illuminating a miniature map of branching roads."
+    },
+    "deity/nyxara": {
+      "alt": "A black silver-edged mask displayed inside a shadowed shrine."
+    },
+    "deity/myrr": {
+      "alt": "Carved hands cradling clear water in a green sanctuary."
+    },
+    "deity/vespera": {
+      "alt": "Three theatrical masks fanned across a dark ceremonial backdrop."
+    },
+    "deity/calystral": {
+      "alt": "A burning heart held within a crescent frame among roses and artists' tools."
+    },
+    "deity/borhild": {
+      "alt": "A lit forge altar marked with an ember-red craft rune."
+    },
+    "deity/selithiel": {
+      "alt": "A moonlit branch crossing a luminous pool before an open stone doorway."
+    },
+    "deity/pella": {
+      "alt": "A warm copper kettle, bread, and a house key arranged at a hearth shrine."
+    },
+    "deity/gearmaster": {
+      "alt": "An intricate brass mechanism turning among gems, tools, and playful inventions."
+    },
+    "deity/ghorak": {
+      "alt": "An eye-marked stone tablet standing before a smoke-darkened fortress."
+    },
+    "deity/zorren": {
+      "alt": "White antlers framing a moonlit woodland hunting shrine."
+    },
+    "state/validation-error": {
+      "alt": "A cracked but repairable seal.",
+      "accent": "#4a3230"
+    },
+    "state/choice-locked": {
+      "alt": "A locked seal over an unavailable choice.",
+      "accent": "#3a3540"
+    },
+    "state/save-pending": {
+      "alt": "A seal still being pressed.",
+      "accent": "#3f3c2e"
+    },
+    "state/save-confirmed": {
+      "alt": "A completed seal beside an open path.",
+      "accent": "#37472f"
+    },
+    "state/save-failed": {
+      "alt": "A preserved draft beside a seal that did not close.",
+      "accent": "#452f2f"
+    },
+    "state/onboarding-incomplete": {
+      "alt": "A character folio left bookmarked and unfinished.",
+      "accent": "#3d3830"
+    },
+    "state/protocol-fallback": {
+      "alt": "An ornate frame folding down into a plain terminal window.",
+      "accent": "#2f3540"
+    },
+    "state/server-unavailable": {
+      "alt": "A dormant gateway with a marked route back.",
+      "accent": "#333039"
+    },
+    "race/human": {
+      "alt": "Human adventurers of varied build and bearing, gathered on a road above a working port."
+    },
+    "race/moon-elf": {
+      "alt": "Moon elves under a clear night sky, poised and unhurried in silver-toned dress."
+    },
+    "race/mountain-dwarf": {
+      "alt": "Mountain dwarves at a hall entrance, surrounded by cut stone and steady lamplight."
+    },
+    "race/half-troll": {
+      "alt": "A half-troll traveller resting a heavy pack, depicted as a person rather than a monster."
+    },
+    "race/crystal-dwarf": {
+      "alt": "Crystal dwarves among mineral formations that catch and scatter light."
+    },
+    "race/lightfoot-halfling": {
+      "alt": "Lightfoot halflings on the move, light-footed and travelling cheerfully."
+    },
+    "race/half-elf": {
+      "alt": "Half-elf adventurers whose features belong wholly to neither parent ancestry."
+    },
+    "race/half-orc": {
+      "alt": "Half-orc adventurers standing at ease, resilient and self-possessed."
+    },
+    "race/rock-gnome": {
+      "alt": "Rock gnomes at a cluttered workbench of half-finished mechanisms."
+    },
+    "race/trelux": {
+      "alt": "Trelux figures with chitinous plating and folded wings in a warm alien light."
+    },
+    "race/arcana-golem": {
+      "alt": "Arcana golems whose constructed bodies show visible arcane structure."
+    },
+    "race/drow": {
+      "alt": "Drow adventurers in subterranean lamplight, composed and watchful."
+    },
+    "race/duergar": {
+      "alt": "Duergar in austere forged gear before a deep-delved gate."
+    },
+    "race/high-elf": {
+      "alt": "High elves in a hall of arcane and civic tradition."
+    },
+    "race/wild-elf": {
+      "alt": "Wild elves moving through dense woodland with quiet confidence."
+    },
+    "race/half-drow": {
+      "alt": "Half-drow adventurers between surface and underdark light."
+    },
+    "race/dragonborn": {
+      "alt": "Dragonborn adventurers with scaled hide and heroic bearing."
+    },
+    "race/tiefling": {
+      "alt": "Tiefling adventurers whose planar heritage shows in horn, tail, and eye."
+    },
+    "race/stout-halfling": {
+      "alt": "Stout halflings, sturdy and grounded, gathered outside a village hall."
+    },
+    "race/forest-gnome": {
+      "alt": "Forest gnomes half-hidden among roots and undergrowth with woodland companions."
+    },
+    "race/gold-dwarf": {
+      "alt": "Gold dwarves in ceremonial metalwork within an established hall."
+    },
+    "race/aasimar": {
+      "alt": "Aasimar adventurers touched by a restrained celestial light."
+    },
+    "race/tabaxi": {
+      "alt": "Tabaxi travellers mid-stride, curious and agile, with varied coat patterns."
+    },
+    "race/goliath": {
+      "alt": "Goliath adventurers against a high mountain backdrop, calm and enduring."
+    },
+    "race/shade": {
+      "alt": "Shade figures wrapped in controlled shadow and negative space."
+    },
+    "race/fae": {
+      "alt": "Fae figures at a tiny scale, winged and glamour-lit among oversized foliage."
+    },
+    "race/goblin": {
+      "alt": "Goblin adventurers with clever eyes and improvised, well-kept gear."
+    },
+    "race/hobgoblin": {
+      "alt": "Hobgoblins in disciplined martial order, upright and deliberate."
+    },
+    "class/wizard": {
+      "alt": "A wizard working deliberately over an open book of arcane notation."
+    },
+    "class/cleric": {
+      "alt": "A cleric channelling divine light without reference to any one deity."
+    },
+    "class/rogue": {
+      "alt": "A rogue mid-movement with tools of the trade close at hand."
+    },
+    "class/warrior": {
+      "alt": "A warrior in mixed weapons and armour, trained rather than specialised."
+    },
+    "class/monk": {
+      "alt": "A monk balanced mid-motion, unarmed and focused."
+    },
+    "class/druid": {
+      "alt": "A druid amid layered animal and elemental forms suggesting shapechange."
+    },
+    "class/berserker": {
+      "alt": "A berserker at the crest of controlled battle rage."
+    },
+    "class/sorcerer": {
+      "alt": "A sorcerer whose power visibly rises from within rather than from study."
+    },
+    "class/paladin": {
+      "alt": "A paladin raising a protective radiant defence."
+    },
+    "class/blackguard": {
+      "alt": "A blackguard commanding a dark divine power, still clearly readable."
+    },
+    "class/ranger": {
+      "alt": "A ranger reading a trail, equipped for both bow and blade."
+    },
+    "class/bard": {
+      "alt": "A bard performing, surrounded by instruments rather than committed to one."
+    },
+    "class/psionicist": {
+      "alt": "A psionicist shaping geometric structures of pure thought."
+    },
+    "class/alchemist": {
+      "alt": "An alchemist at a controlled workshop of extracts and volatile glassware."
+    },
+    "class/inquisitor": {
+      "alt": "An inquisitor examining evidence by lantern light."
+    },
+    "class/summoner": {
+      "alt": "A summoner and an indistinct eidolon linked by a visible bond."
+    },
+    "class/warlock": {
+      "alt": "A warlock drawing on pact power from an unseen patron."
+    },
+    "class/artificer": {
+      "alt": "An artificer assembling a magical device from precise components."
+    }
+  }
+}

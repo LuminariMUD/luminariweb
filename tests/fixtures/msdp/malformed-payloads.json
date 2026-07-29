@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "fixtureFile": "malformed-payloads",
+  "description": "Malformed MSDP payload fixtures with safe expected parser output.",
+  "fixtures": [
+    {
+      "id": "malformed.leading-marker-skip",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from current parser marker-skipping behavior in server/index.ts.",
+        "sanitized": true
+      },
+      "description": "Leading orphan markers and a missing VAL marker are skipped until a valid pair appears.",
+      "coverage": ["malformed", "marker-skipping", "missing-marker", "numeric-normalization"],
+      "sourceFacts": [
+        "server/index.ts parseMsdpPayload skips bytes until MSDP_VAR and continues when a variable is not followed by MSDP_VAL.",
+        "Phase 01 parser tests must cover malformed MSDP without crashing."
+      ],
+      "payloadTokens": [
+        "VAL",
+        "orphan text",
+        "TABLE_CLOSE",
+        "VAR",
+        "LEVEL",
+        "17",
+        "VAR",
+        "HEALTH",
+        "VAL",
+        "5"
+      ],
+      "expectedPairs": [["HEALTH", 5]],
+      "notes": [
+        "The LEVEL entry is intentionally malformed because it has no VAL marker before its scalar content."
+      ]
+    },
+    {
+      "id": "malformed.truncated-value",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from current parser truncated scalar behavior in server/index.ts.",
+        "sanitized": true
+      },
+      "description": "A variable followed by VAL and no bytes parses as an empty string rather than crashing.",
+      "coverage": ["malformed", "truncated", "scalar", "empty-values"],
+      "sourceFacts": [
+        "server/index.ts readScalar returns an empty string when called at payload end."
+      ],
+      "payloadTokens": ["VAR", "SERVER_ID", "VAL"],
+      "expectedPairs": [["SERVER_ID", ""]],
+      "notes": [
+        "This documents current safe parser output and does not require a behavior change in this session."
+      ]
+    },
+    {
+      "id": "malformed.empty-variable",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from current parser empty-variable behavior in server/index.ts.",
+        "sanitized": true
+      },
+      "description": "An empty variable name is ignored while later valid pairs still parse.",
+      "coverage": ["malformed", "empty-variable", "numeric-normalization"],
+      "sourceFacts": [
+        "server/index.ts only pushes an MSDP pair when the parsed variable name is non-empty."
+      ],
+      "payloadTokens": ["VAR", "", "VAL", "ignored value", "VAR", "LEVEL", "VAL", "4"],
+      "expectedPairs": [["LEVEL", 4]],
+      "notes": ["The ignored value remains inert because its variable name is empty."]
+    },
+    {
+      "id": "malformed.incomplete-table",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from current parser incomplete table behavior in server/index.ts.",
+        "sanitized": true
+      },
+      "description": "A table without TABLE_CLOSE returns the parsed table entries safely.",
+      "coverage": ["malformed", "incomplete-table", "room-exits", "numeric-normalization"],
+      "sourceFacts": [
+        "server/index.ts table parsing stops at payload end if TABLE_CLOSE is missing.",
+        "PRD Source Protocol Facts confirms ROOM_EXITS."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ROOM_EXITS",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "north",
+        "VAL",
+        "1002",
+        "VAR",
+        "east",
+        "VAL",
+        "1003"
+      ],
+      "expectedPairs": [
+        [
+          "ROOM_EXITS",
+          {
+            "north": 1002,
+            "east": 1003
+          }
+        ]
+      ],
+      "notes": [
+        "Future hardening may choose a stricter result, but current safe behavior is partial output."
+      ]
+    },
+    {
+      "id": "malformed.incomplete-array",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from current parser incomplete array behavior in server/index.ts.",
+        "sanitized": true
+      },
+      "description": "An array without ARRAY_CLOSE returns parsed items safely.",
+      "coverage": ["malformed", "incomplete-array", "actions"],
+      "sourceFacts": [
+        "server/index.ts array parsing stops at payload end if ARRAY_CLOSE is missing.",
+        "PRD Source Protocol Facts confirms ACTIONS."
+      ],
+      "payloadTokens": ["VAR", "ACTIONS", "VAL", "ARRAY_OPEN", "VAL", "standard", "VAL", "move"],
+      "expectedPairs": [["ACTIONS", ["standard", "move"]]],
+      "notes": [
+        "Future hardening may choose a stricter result, but current safe behavior is partial output."
+      ]
+    }
+  ]
+}

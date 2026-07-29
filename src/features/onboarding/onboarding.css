@@ -1,0 +1,1587 @@
+/*
+ * Luminari structured onboarding.
+ *
+ * All motion here is produced by moving, scaling, and cross-fading still
+ * layers. Nothing depends on video or pre-rendered animation, and the
+ * reduced-motion block at the end removes major motion rather than merely
+ * shortening it.
+ */
+
+.onboarding {
+  --ob-ink: #f2ece0;
+  --ob-ink-quiet: #b9b0a1;
+  --ob-ink-faint: #8b8375;
+  --ob-panel: rgb(14 17 22 / 76%);
+  --ob-panel-solid: #12161d;
+  --ob-edge: rgb(200 162 74 / 28%);
+  --ob-edge-strong: #c8a24a;
+  --ob-focus: #8fd0ff;
+  --ob-danger: #ff9a8b;
+  --ob-success: #8fd39a;
+  --ob-radius: 14px;
+  --ob-radius-sm: 8px;
+  --ob-gap: clamp(0.75rem, 1.6vw, 1.5rem);
+  --ob-shadow: 0 18px 48px rgb(0 0 0 / 45%);
+  --scene-accent: #1a222c;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* A fixed height, not a minimum: the stage below is the scrolling region, and
+     it can only scroll if this container is actually bounded. */
+  height: 100%;
+  min-height: 0;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--ob-ink);
+  background: var(--ob-panel-solid);
+  font-family: inherit;
+}
+
+/* --- Scene backdrop ----------------------------------------------------- */
+
+.onboarding-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--scene-accent);
+}
+
+.onboarding-scene--empty {
+  background: linear-gradient(160deg, #161d27, #0d1116 70%);
+}
+
+.onboarding-scene__plate {
+  position: absolute;
+  inset: -3%;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+  transition: transform 900ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation: onboarding-scene-in 1100ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.onboarding-scene__plate img,
+.onboarding-scene__layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.onboarding-scene__layer {
+  position: absolute;
+  inset: -4%;
+  transition: transform 900ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  pointer-events: none;
+}
+
+.onboarding-scene__layer--overlay {
+  mix-blend-mode: screen;
+  opacity: 0.7;
+}
+
+.onboarding-scene__motes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.onboarding-scene__mote {
+  position: absolute;
+  bottom: -8%;
+  animation-name: onboarding-mote-drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+.onboarding-scene__vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 50% 15%, transparent 30%, rgb(6 8 11 / 72%) 100%),
+    linear-gradient(to bottom, rgb(6 8 11 / 35%), rgb(6 8 11 / 15%) 40%, rgb(6 8 11 / 80%));
+}
+
+@keyframes onboarding-scene-in {
+  from {
+    opacity: 0;
+    transform: scale(1.09);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes onboarding-mote-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(var(--mote-drift, 0), -115vh, 0);
+  }
+}
+
+/* --- Chrome ------------------------------------------------------------- */
+
+.onboarding__chrome {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ob-gap);
+  padding: clamp(0.75rem, 2vw, 1.35rem) clamp(0.9rem, 3vw, 2.25rem);
+}
+
+.onboarding__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: var(--ob-ink-quiet);
+}
+
+.onboarding__brand-mark {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  border: 1px solid var(--ob-edge-strong);
+  box-shadow: inset 0 0 0 3px rgb(200 162 74 / 22%);
+}
+
+.onboarding__chrome-actions {
+  display: inline-flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.onboarding__audio-panel {
+  flex-basis: 100%;
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--ob-edge);
+  border-radius: var(--ob-radius);
+  background: var(--ob-panel);
+  backdrop-filter: blur(8px);
+  max-width: 30rem;
+  margin-left: auto;
+}
+
+.onboarding__audio-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--ob-ink-quiet);
+  text-transform: capitalize;
+}
+
+.onboarding__audio-row span {
+  min-width: 8rem;
+}
+
+.onboarding__audio-row input[type='range'] {
+  flex: 1;
+}
+
+/* --- Progress rail ------------------------------------------------------ */
+
+.onboarding__progress {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(0.5rem, 2vw, 1.5rem);
+  margin: 0;
+  padding: 0 clamp(0.9rem, 3vw, 2.25rem) 0.5rem;
+  list-style: none;
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ob-ink-faint);
+}
+
+.onboarding__progress-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.onboarding__progress-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+.onboarding__progress-step.is-current {
+  color: var(--ob-edge-strong);
+}
+
+.onboarding__progress-step.is-current .onboarding__progress-dot {
+  opacity: 1;
+  box-shadow: 0 0 0 4px rgb(200 162 74 / 18%);
+}
+
+/* --- Stage -------------------------------------------------------------- */
+
+.onboarding__stage {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 auto;
+  /* Without this a grid/flex child refuses to shrink below its content, which
+     is what stops it scrolling. */
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+  gap: var(--ob-gap);
+  align-items: start;
+  padding: clamp(0.5rem, 2vw, 1.5rem) clamp(0.9rem, 3vw, 2.25rem) clamp(1.25rem, 4vw, 2.5rem);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ob-edge) transparent;
+}
+
+.onboarding__stage::-webkit-scrollbar {
+  width: 10px;
+}
+
+.onboarding__stage::-webkit-scrollbar-thumb {
+  background: rgb(200 162 74 / 35%);
+  border-radius: 999px;
+}
+
+.onboarding__stage::-webkit-scrollbar-thumb:hover {
+  background: rgb(200 162 74 / 60%);
+}
+
+/* The chrome and progress rail stay put while the stage scrolls under them. */
+.onboarding__chrome,
+.onboarding__progress {
+  flex: none;
+}
+
+.onboarding__main {
+  min-width: 0;
+  display: grid;
+  gap: var(--ob-gap);
+  align-content: start;
+}
+
+.onboarding__header {
+  max-width: 46rem;
+}
+
+.onboarding__title {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 24px rgb(0 0 0 / 65%);
+}
+
+.onboarding__title:focus-visible {
+  outline: 2px solid var(--ob-focus);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
+.onboarding__prompt {
+  margin: 0;
+  color: var(--ob-ink-quiet);
+  font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+  text-shadow: 0 1px 12px rgb(0 0 0 / 70%);
+}
+
+.onboarding__error {
+  margin: 0;
+  padding: 0.7rem 0.95rem;
+  border-radius: var(--ob-radius-sm);
+  border: 1px solid rgb(255 154 139 / 45%);
+  background: rgb(60 20 18 / 72%);
+  color: var(--ob-danger);
+  font-size: 0.92rem;
+}
+
+.onboarding__screen {
+  animation: onboarding-screen-in 420ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes onboarding-screen-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+}
+
+/* --- Buttons ------------------------------------------------------------ */
+
+.onboarding-button {
+  appearance: none;
+  border: 1px solid var(--ob-edge);
+  border-radius: 999px;
+  background: rgb(18 22 29 / 78%);
+  color: var(--ob-ink);
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.1rem;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.onboarding-button:hover:not(:disabled) {
+  background: rgb(30 36 46 / 88%);
+  border-color: var(--ob-edge-strong);
+}
+
+.onboarding-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.onboarding-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.onboarding-button--primary {
+  background: linear-gradient(180deg, #d8b665, #b3893a);
+  border-color: #e2c887;
+  color: #17130a;
+  font-weight: 600;
+}
+
+.onboarding-button--primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #e6c87c, #c2984a);
+}
+
+.onboarding-button--quiet {
+  background: rgb(12 15 20 / 62%);
+  color: var(--ob-ink-quiet);
+}
+
+.onboarding-button:focus-visible,
+.onboarding-card__button:focus-visible,
+.onboarding-character__button:focus-visible,
+.onboarding-form__input:focus-visible {
+  outline: 2px solid var(--ob-focus);
+  outline-offset: 3px;
+}
+
+.onboarding-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.onboarding-actions--secondary {
+  margin-top: 0.25rem;
+}
+
+.onboarding-actions--lobby {
+  margin-top: var(--ob-gap);
+}
+
+/* --- Cards -------------------------------------------------------------- */
+
+.onboarding-gallery {
+  display: grid;
+  gap: var(--ob-gap);
+}
+
+.onboarding-gallery__grid {
+  display: grid;
+  gap: var(--ob-gap);
+}
+
+.onboarding-gallery__grid--grid {
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+}
+
+.onboarding-gallery__grid--wide {
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.onboarding-gallery__grid--pair {
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  max-width: 52rem;
+}
+
+.onboarding-card {
+  display: flex;
+  flex-direction: column;
+  /* Cards in a row share a height so their labels and facts line up. */
+  height: 100%;
+  gap: 0.5rem;
+  padding: 0.6rem;
+  border: 1px solid var(--ob-edge);
+  border-radius: var(--ob-radius);
+  background: var(--ob-panel);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--ob-shadow);
+  transition:
+    border-color 200ms ease,
+    transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 240ms ease;
+}
+
+.onboarding-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--ob-edge-strong);
+}
+
+.onboarding-card.is-selected {
+  border-color: var(--ob-edge-strong);
+  box-shadow:
+    var(--ob-shadow),
+    inset 0 0 0 1px var(--ob-edge-strong);
+}
+
+.onboarding-card.is-locked {
+  opacity: 0.72;
+}
+
+.onboarding-card__button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  gap: 0.5rem;
+  border-radius: var(--ob-radius-sm);
+}
+
+.onboarding-card__button:disabled {
+  cursor: not-allowed;
+}
+
+.onboarding-card__art {
+  position: relative;
+  display: block;
+  border-radius: var(--ob-radius-sm);
+  overflow: hidden;
+  background: linear-gradient(160deg, #1d242e, #0f1319);
+  aspect-ratio: 4 / 5;
+}
+
+.onboarding-card--path .onboarding-card__art,
+.onboarding-card--seal .onboarding-card__art {
+  aspect-ratio: 16 / 10;
+}
+
+.onboarding-card--seal .onboarding-card__art {
+  aspect-ratio: 1 / 1;
+}
+
+.onboarding-card__art picture,
+.onboarding-card__art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-size: cover;
+  transition: transform 500ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.onboarding-card:hover .onboarding-card__art img {
+  transform: scale(1.05);
+}
+
+.onboarding-card__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(8 10 14 / 78%), transparent 62%);
+}
+
+.onboarding-card.is-locked .onboarding-card__art img {
+  /* Restrained enough that the subject stays recognisable; the reason is
+     always given in text beneath the card. */
+  filter: grayscale(0.7) brightness(0.72);
+}
+
+.onboarding-card__body {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0 0.2rem;
+}
+
+.onboarding-card__label {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.onboarding-card__state {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ob-edge-strong);
+  border: 1px solid var(--ob-edge);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+}
+
+.onboarding-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0 0.2rem;
+}
+
+.onboarding-card__badge {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ob-ink-faint);
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+}
+
+.onboarding-card__summary {
+  margin: 0;
+  padding: 0 0.2rem;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--ob-ink-quiet);
+  /* Server descriptions vary widely in length; clamping keeps a row of cards
+     scannable. The full text is on the details panel. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+}
+
+.onboarding-card--path .onboarding-card__summary,
+.onboarding-card--seal .onboarding-card__summary {
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+/* The details panel shows the description in full. */
+.onboarding-detail .onboarding-card__summary {
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
+}
+
+.onboarding-card__facts {
+  margin: 0;
+  padding: 0 0.2rem;
+  list-style: none;
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.78rem;
+  color: var(--ob-ink-quiet);
+}
+
+.onboarding-card__facts li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.onboarding-card__fact-value {
+  margin-left: auto;
+  color: var(--ob-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.onboarding-card__monogram {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgb(242 236 224 / 32%);
+  background:
+    radial-gradient(80% 70% at 50% 30%, rgb(200 162 74 / 14%), transparent 70%),
+    linear-gradient(160deg, #212a35, #10151b);
+  border: 1px solid rgb(255 255 255 / 6%);
+  border-radius: inherit;
+}
+
+.onboarding-card__facts {
+  margin-top: auto;
+}
+
+.onboarding-card__inspect {
+  align-self: flex-start;
+  appearance: none;
+  border: 0;
+  background: none;
+  color: var(--ob-focus);
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.2rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.onboarding-glyph {
+  width: 1.1rem;
+  height: 1.1rem;
+  opacity: 0.72;
+  filter: invert(1);
+  flex: none;
+}
+
+/* --- Detail panel ------------------------------------------------------- */
+
+.onboarding-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+  gap: var(--ob-gap);
+  padding: var(--ob-gap);
+  border: 1px solid var(--ob-edge-strong);
+  border-radius: var(--ob-radius);
+  background: var(--ob-panel);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--ob-shadow);
+  animation: onboarding-screen-in 320ms ease both;
+}
+
+.onboarding-detail__art picture,
+.onboarding-detail__art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--ob-radius-sm);
+}
+
+.onboarding-detail__body h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.35rem;
+}
+
+.onboarding-detail__body p {
+  margin: 0 0 0.75rem;
+  color: var(--ob-ink-quiet);
+  line-height: 1.55;
+}
+
+.onboarding-detail__facts {
+  margin: 0 0 0.9rem;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.onboarding-detail__facts div {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.86rem;
+  border-bottom: 1px solid rgb(255 255 255 / 7%);
+  padding-bottom: 0.3rem;
+}
+
+.onboarding-detail__facts dt {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ob-ink-quiet);
+  min-width: 10rem;
+}
+
+.onboarding-detail__facts dd {
+  margin: 0 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.onboarding-detail__locked {
+  color: var(--ob-danger);
+}
+
+/* --- Compass ------------------------------------------------------------ */
+
+.onboarding-compass {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 34rem);
+  grid-template-areas:
+    '. axisx'
+    'axisy plate';
+  gap: 0.4rem 0.7rem;
+  align-items: center;
+  justify-content: start;
+}
+
+.onboarding-compass__axis {
+  display: grid;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ob-ink-faint);
+}
+
+.onboarding-compass__axis--x {
+  grid-area: axisx;
+  grid-template-columns: repeat(3, 1fr);
+  text-align: center;
+}
+
+/* Horizontal labels in a narrow column: rotated text is harder to read and
+   inverts the good-to-evil order that the plate itself uses. */
+.onboarding-compass__axis--y {
+  grid-area: axisy;
+  grid-template-rows: repeat(3, 1fr);
+  align-items: center;
+  justify-items: end;
+  align-self: stretch;
+  padding: 0.7rem 0;
+  text-align: right;
+}
+
+.onboarding-compass__plate {
+  grid-area: plate;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  padding: 0.7rem;
+  overflow: hidden;
+  border: 1px solid var(--ob-edge);
+  border-radius: var(--ob-radius);
+  background: var(--ob-panel);
+  backdrop-filter: blur(10px);
+}
+
+.onboarding-compass__backdrop,
+.onboarding-compass__backdrop img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.onboarding-compass__backdrop {
+  pointer-events: none;
+  opacity: 0.28;
+}
+
+.onboarding-compass__backdrop img {
+  object-fit: cover;
+}
+
+.onboarding-compass__cell {
+  position: relative;
+  z-index: 1;
+}
+
+.onboarding-compass__cell--empty {
+  border: 1px dashed rgb(255 255 255 / 10%);
+  border-radius: var(--ob-radius-sm);
+  min-height: 6rem;
+}
+
+/* --- Account lobby ------------------------------------------------------ */
+
+.onboarding-lobby {
+  display: grid;
+  gap: var(--ob-gap);
+}
+
+.onboarding-lobby__grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--ob-gap);
+}
+
+.onboarding-lobby__empty {
+  display: grid;
+  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+  gap: var(--ob-gap);
+  align-items: center;
+  padding: var(--ob-gap);
+  border: 1px solid var(--ob-edge);
+  border-radius: var(--ob-radius);
+  background: var(--ob-panel);
+  backdrop-filter: blur(10px);
+}
+
+.onboarding-lobby__empty h3 {
+  margin: 0 0 0.35rem;
+}
+
+.onboarding-lobby__empty p {
+  margin: 0;
+  color: var(--ob-ink-quiet);
+}
+
+.onboarding-lobby__empty picture,
+.onboarding-lobby__empty img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--ob-radius-sm);
+}
+
+.onboarding-character__button {
+  appearance: none;
+  width: 100%;
+  border: 1px solid var(--ob-edge);
+  border-radius: var(--ob-radius);
+  background: var(--ob-panel);
+  backdrop-filter: blur(10px);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.6rem;
+  box-shadow: var(--ob-shadow);
+  transition:
+    transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    border-color 200ms ease;
+}
+
+.onboarding-character__button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  border-color: var(--ob-edge-strong);
+}
+
+.onboarding-character__art {
+  position: relative;
+  display: block;
+  border-radius: var(--ob-radius-sm);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(160deg, #1d242e, #0f1319);
+}
+
+.onboarding-character__art > picture,
+.onboarding-character__art > picture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.onboarding-character__emblems {
+  position: absolute;
+  right: 0.4rem;
+  bottom: 0.4rem;
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.onboarding-character__emblems img {
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  border: 1px solid var(--ob-edge);
+  background: rgb(10 12 16 / 80%);
+}
+
+.onboarding-character__identity {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.onboarding-character__name {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.onboarding-character__meta {
+  font-size: 0.82rem;
+  color: var(--ob-ink-quiet);
+  max-width: 100%;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.onboarding-character__status {
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ob-ink-faint);
+}
+
+.onboarding-character__status--warn {
+  color: #e8c06a;
+}
+
+.onboarding-character__play {
+  justify-self: start;
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ob-edge-strong);
+  border: 1px solid var(--ob-edge);
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+}
+
+/* --- Selected character menu ------------------------------------------- */
+
+.onboarding-character-menu__eyebrow {
+  margin: 0;
+  color: var(--ob-edge-strong);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.onboarding-character-menu__name {
+  margin: -0.25rem 0 0;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  line-height: 1.15;
+}
+
+.onboarding-character-menu__details {
+  margin: -0.35rem 0 0;
+  color: var(--ob-ink-quiet);
+  font-size: 0.9rem;
+}
+
+/* --- Panels and forms --------------------------------------------------- */
+
+.onboarding-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+  gap: var(--ob-gap);
+  align-items: center;
+  padding: var(--ob-gap);
+  border: 1px solid var(--ob-edge);
+  border-radius: var(--ob-radius);
+  background: var(--ob-panel);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--ob-shadow);
+  max-width: 52rem;
+}
+
+.onboarding-panel__art picture,
+.onboarding-panel__art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--ob-radius-sm);
+}
+
+.onboarding-panel__art:empty {
+  display: none;
+}
+
+.onboarding-panel__body {
+  display: grid;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.onboarding-panel__help {
+  margin: 0;
+  color: var(--ob-ink-quiet);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.onboarding-panel__echo {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 1.15rem;
+}
+
+.onboarding-panel__echo-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ob-ink-faint);
+}
+
+.onboarding-motd {
+  margin: 0;
+  max-height: 18rem;
+  overflow: auto;
+  padding: 0.8rem;
+  border-radius: var(--ob-radius-sm);
+  border: 1px solid rgb(255 255 255 / 8%);
+  background: rgb(8 10 14 / 70%);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  color: var(--ob-ink-quiet);
+}
+
+.onboarding-form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.onboarding-form__label {
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ob-ink-faint);
+}
+
+.onboarding-form__row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.onboarding-form__input {
+  flex: 1 1 12rem;
+  min-width: 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--ob-radius-sm);
+  border: 1px solid var(--ob-edge);
+  background: rgb(8 10 14 / 82%);
+  color: var(--ob-ink);
+  font: inherit;
+}
+
+.onboarding-form__hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--ob-ink-faint);
+}
+
+.onboarding-empty {
+  margin: 0;
+  color: var(--ob-ink-quiet);
+}
+
+/* --- Summary rail ------------------------------------------------------- */
+
+.onboarding-summary {
+  position: sticky;
+  top: 0;
+  display: grid;
+  gap: 0.7rem;
+  padding: var(--ob-gap);
+  border: 1px solid var(--ob-edge);
+  border-radius: var(--ob-radius);
+  background: var(--ob-panel);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--ob-shadow);
+}
+
+.onboarding-summary__title {
+  margin: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ob-ink-faint);
+}
+
+.onboarding-summary__rows {
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.onboarding-summary__row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  border-bottom: 1px solid rgb(255 255 255 / 7%);
+  padding-bottom: 0.3rem;
+}
+
+.onboarding-summary__row dt {
+  color: var(--ob-ink-quiet);
+  min-width: 5.5rem;
+}
+
+.onboarding-summary__row dd {
+  margin: 0 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.onboarding-summary__emblem img {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.onboarding-summary__status {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: var(--ob-ink-quiet);
+  line-height: 1.45;
+}
+
+.onboarding-summary__status img {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: var(--ob-radius-sm);
+  object-fit: cover;
+  flex: none;
+}
+
+.onboarding-summary__status.is-saved strong {
+  color: var(--ob-success);
+}
+
+.onboarding-summary__status.is-failed strong {
+  color: var(--ob-danger);
+}
+
+/* --- Utilities ---------------------------------------------------------- */
+
+.onboarding-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Responsive --------------------------------------------------------- */
+
+@media (max-width: 1023px) {
+  .onboarding__stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .onboarding-summary {
+    position: static;
+  }
+
+  .onboarding-detail,
+  .onboarding-panel,
+  .onboarding-lobby__empty {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .onboarding-compass {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 599px) {
+  /*
+   * Two-choice path screens need an explicit single track on phones. The
+   * auto-fit track keeps both 17rem cards on one intrinsic-width row, which
+   * overflows the clipped stage and makes the second choice unreachable.
+   */
+  .onboarding-gallery__grid--pair {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: none;
+  }
+
+  .onboarding-gallery__grid--grid {
+    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  }
+
+  .onboarding__progress {
+    font-size: 0.66rem;
+    gap: 0.5rem;
+  }
+
+  .onboarding-card__facts {
+    display: none;
+  }
+
+  .onboarding-compass__axis--y {
+    display: none;
+  }
+
+  .onboarding-compass {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'axisx' 'plate';
+  }
+}
+
+/* At 360px the galleries drop to two columns rather than crushing the art. */
+@media (max-width: 380px) {
+  .onboarding-gallery__grid--grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .onboarding__chrome {
+    gap: 0.5rem;
+  }
+}
+
+/* --- Reduced motion ----------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding *,
+  .onboarding *::before,
+  .onboarding *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .onboarding-scene__motes {
+    display: none;
+  }
+
+  .onboarding-scene__plate {
+    transform: none !important;
+    inset: 0;
+  }
+
+  .onboarding-scene__layer {
+    transform: none !important;
+  }
+
+  .onboarding-card:hover {
+    transform: none;
+  }
+
+  .onboarding-card:hover .onboarding-card__art img {
+    transform: none;
+  }
+}
+
+.onboarding.is-reduced-motion .onboarding-scene__motes {
+  display: none;
+}
+
+/* ==========================================================================
+   Protocol v2: role-play identity suite
+   ========================================================================== */
+
+/* Status must be legible without colour, so every state also carries a glyph
+   and a text label. Colour is reinforcement only. */
+.rp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+}
+
+.rp-status-glyph {
+  font-size: 0.9em;
+}
+
+.rp-status-unset .rp-status-label {
+  color: var(--onboarding-muted, #9aa4b2);
+}
+.rp-status-configured .rp-status-label {
+  color: var(--onboarding-accent, #7fd1a8);
+}
+.rp-status-required .rp-status-label {
+  color: var(--onboarding-warning, #f0c674);
+  font-weight: 600;
+}
+.rp-status-locked .rp-status-label,
+.rp-status-unavailable .rp-status-label,
+.rp-status-error .rp-status-label {
+  color: var(--onboarding-muted, #9aa4b2);
+}
+
+/* --- profile hub --------------------------------------------------------- */
+
+.rp-hub-summary {
+  margin: 0 0 1rem;
+  color: var(--onboarding-muted, #9aa4b2);
+}
+
+.rp-hub-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rp-hub-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  /* Comfortable touch target on the smallest supported widths. */
+  min-height: 3.5rem;
+  padding: 0.75rem;
+  text-align: left;
+  border: 1px solid var(--onboarding-border, #2c3442);
+  border-radius: 0.5rem;
+  background: var(--onboarding-panel, #161b23);
+  color: inherit;
+  cursor: pointer;
+}
+
+.rp-hub-button:disabled {
+  cursor: not-allowed;
+  /* Kept readable rather than faded out: a locked item still has to explain
+     itself, and its reason sits directly beneath it. */
+  opacity: 0.75;
+}
+
+.rp-hub-image {
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.35rem;
+  overflow: hidden;
+  flex: none;
+}
+
+.rp-hub-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rp-hub-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.rp-hub-label {
+  font-weight: 600;
+}
+
+.rp-hub-value {
+  color: var(--onboarding-muted, #9aa4b2);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.rp-hub-reason {
+  margin: 0.35rem 0 0;
+  padding-left: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--onboarding-muted, #9aa4b2);
+}
+
+/* --- editor -------------------------------------------------------------- */
+
+.rp-editor-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+}
+
+.rp-editor-field {
+  width: 100%;
+  min-height: 12rem;
+  padding: 0.75rem;
+  border: 1px solid var(--onboarding-border, #2c3442);
+  border-radius: 0.5rem;
+  background: var(--onboarding-panel, #161b23);
+  color: inherit;
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.rp-editor-field[readonly] {
+  opacity: 0.7;
+}
+
+.rp-byte-counter {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  color: var(--onboarding-muted, #9aa4b2);
+}
+
+.rp-byte-counter-secondary {
+  opacity: 0.8;
+}
+
+.rp-byte-counter-over,
+.rp-byte-counter-warning {
+  color: var(--onboarding-danger, #e88b8b);
+  font-weight: 600;
+}
+
+.rp-editor-failed,
+.rp-error {
+  color: var(--onboarding-danger, #e88b8b);
+}
+
+/* --- persistence and warnings -------------------------------------------- */
+
+.rp-persistence-saved {
+  color: var(--onboarding-accent, #7fd1a8);
+}
+/* "accepted" is deliberately not styled as success: it is not durable yet. */
+.rp-persistence-accepted {
+  color: var(--onboarding-muted, #9aa4b2);
+}
+.rp-persistence-failed {
+  color: var(--onboarding-danger, #e88b8b);
+}
+
+.rp-irreversible,
+.rp-required-banner {
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid var(--onboarding-warning, #f0c674);
+  background: rgba(240, 198, 116, 0.08);
+  border-radius: 0.25rem;
+}
+
+/* --- ideas, catalog, detail ---------------------------------------------- */
+
+.rp-idea-list {
+  display: grid;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.rp-idea {
+  padding: 0.75rem;
+  border: 1px solid var(--onboarding-border, #2c3442);
+  border-radius: 0.5rem;
+  background: var(--onboarding-panel, #161b23);
+}
+
+.rp-idea-text {
+  margin: 0 0 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+.rp-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.rp-pager p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--onboarding-muted, #9aa4b2);
+}
+
+.rp-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 1rem 0;
+}
+
+.rp-fact dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--onboarding-muted, #9aa4b2);
+}
+
+.rp-fact dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.rp-detail-body,
+.rp-detail-summary,
+.rp-preview {
+  overflow-wrap: anywhere;
+}
+
+.rp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.rp-actions button {
+  min-height: 2.75rem;
+  padding: 0 1rem;
+}
+
+.rp-empty {
+  color: var(--onboarding-muted, #9aa4b2);
+  font-style: italic;
+}
+
+/* Visually hidden but announced: transfer outcomes must reach a screen reader
+   without adding a redundant visible duplicate of the inline messages. */
+.rp-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Small phones: 390 px and 360 px must not scroll the page horizontally. */
+@media (max-width: 599px) {
+  .rp-hub-list {
+    grid-template-columns: 1fr;
+  }
+
+  .rp-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .rp-actions button {
+    /* Full-width stacked buttons rather than a cramped row that overflows. */
+    flex: 1 1 100%;
+  }
+
+  .rp-pager {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .rp-hub-button {
+    gap: 0.5rem;
+    padding: 0.6rem;
+  }
+
+  .rp-hub-image {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .rp-editor-field {
+    min-height: 10rem;
+  }
+}

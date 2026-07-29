@@ -1,0 +1,24 @@
+#!/bin/bash
+set -euo pipefail
+
+pki_dir=/root/luminari-mtls-pki
+client_certificate=$pki_dir/worker-current.crt
+client_key=$pki_dir/worker-current.key
+
+summary=$(
+    timeout 12 openssl s_client \
+        -connect 127.0.0.1:54443 \
+        -servername mud-origin.luminarimud.com \
+        -verify_hostname mud-origin.luminarimud.com \
+        -verify_return_error \
+        -CApath /etc/ssl/certs \
+        -cert "$client_certificate" \
+        -key "$client_key" \
+        -brief \
+        </dev/null 2>&1 >/dev/null
+)
+
+printf "%s\n" "$summary" | grep -q "Verification: OK"
+printf "%s\n" "$summary" | grep -Eq "Protocol version: TLSv1\.[23]"
+printf "%s\n" "$summary" |
+    grep -E "^(CONNECTION ESTABLISHED|Protocol version:|Ciphersuite:|Peer certificate:|Verification:)"

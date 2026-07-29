@@ -1,0 +1,56 @@
+[Unit]
+Description=Luminari web-to-MUD loopback gateway
+Documentation=https://github.com/LuminariMUD/luminariweb
+Wants=network-online.target
+After=network-online.target luminari.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=luminari-web-gateway
+Group=luminari-web-gateway
+WorkingDirectory=/opt/luminari-web-gateway/current
+ExecStart=/usr/bin/node dist/server/index.js
+
+Environment=NODE_ENV=production
+Environment=PORT=5191
+Environment=PROXY_LISTEN_HOST=127.0.0.1
+Environment=PROXY_FIXED_LOOPBACK_BACKEND_PORT=4100
+Environment=PROXY_PUBLIC_MODE=true
+Environment=PROXY_ALLOW_CUSTOM_DESTINATIONS=false
+Environment=PROXY_ALLOWED_ORIGINS=https://mud-origin.luminarimud.com
+Environment=PROXY_CONNECT_TIMEOUT_MS=10000
+Environment=PROXY_IDLE_TIMEOUT_MS=3600000
+Environment=WS_CONNECTION_LIMIT_PER_IP=64
+
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+KillSignal=SIGTERM
+UMask=0077
+
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProtectSystem=strict
+ProcSubset=pid
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+IPAddressDeny=any
+IPAddressAllow=localhost
+
+[Install]
+WantedBy=multi-user.target

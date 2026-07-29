@@ -1,0 +1,622 @@
+{
+  "schemaVersion": 1,
+  "fixtureFile": "collections",
+  "description": "Actions, inventory, affects, empty array, and simple table fixtures.",
+  "fixtures": [
+    {
+      "id": "collections.actions.array",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from PRD source protocol facts for confirmed ACTIONS.",
+        "sanitized": true
+      },
+      "description": "ACTIONS parses as an array of action labels.",
+      "coverage": ["actions", "array"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ACTIONS.",
+        "Session 02 keeps ACTIONS as a list-like MudValue."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ACTIONS",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "standard",
+        "VAL",
+        "move",
+        "VAL",
+        "swift",
+        "ARRAY_CLOSE"
+      ],
+      "expectedPairs": [["ACTIONS", ["standard", "move", "swift"]]],
+      "notes": ["Action names are synthetic placeholders for later rendering tests."]
+    },
+    {
+      "id": "collections.actions.table",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 02 action economy fallback requirements.",
+        "sanitized": true
+      },
+      "description": "ACTIONS can be preserved as a top-level table for conservative display fallback.",
+      "coverage": ["actions", "table"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ACTIONS.",
+        "Session 02 renders object-like ACTIONS payloads without claiming action automation semantics."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ACTIONS",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "standard",
+        "VAL",
+        "available",
+        "VAR",
+        "move",
+        "VAL",
+        "spent",
+        "TABLE_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "ACTIONS",
+          {
+            "standard": "available",
+            "move": "spent"
+          }
+        ]
+      ],
+      "notes": [
+        "Action labels and values are synthetic placeholders for raw fallback rendering only."
+      ]
+    },
+    {
+      "id": "collections.inventory.table",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from PRD source protocol facts for confirmed INVENTORY.",
+        "sanitized": true
+      },
+      "description": "INVENTORY parses as a table containing an array and a nested count table.",
+      "coverage": ["inventory", "table", "array", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms INVENTORY.",
+        "Phase 02 plans to normalize INVENTORY once payload shape is confirmed."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "INVENTORY",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "worn",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "practice robe",
+        "VAL",
+        "utility belt",
+        "ARRAY_CLOSE",
+        "VAR",
+        "carried",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "torch",
+        "VAL",
+        "2",
+        "VAR",
+        "ration",
+        "VAL",
+        "5",
+        "TABLE_CLOSE",
+        "TABLE_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "INVENTORY",
+          {
+            "worn": ["practice robe", "utility belt"],
+            "carried": {
+              "torch": 2,
+              "ration": 5
+            }
+          }
+        ]
+      ],
+      "notes": [
+        "This table is a deterministic synthetic shape for parser coverage, not a claim about final INVENTORY schema."
+      ]
+    },
+    {
+      "id": "collections.affects.array",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from PRD source protocol facts for confirmed AFFECTS.",
+        "sanitized": true
+      },
+      "description": "AFFECTS parses as an array of effect tables.",
+      "coverage": ["affects", "array", "table", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms AFFECTS.",
+        "Phase 02 plans to render temporary effects from structured MSDP values."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "AFFECTS",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "bless",
+        "VAR",
+        "duration",
+        "VAL",
+        "12",
+        "TABLE_CLOSE",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "haste",
+        "VAR",
+        "duration",
+        "VAL",
+        "3",
+        "TABLE_CLOSE",
+        "ARRAY_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "AFFECTS",
+          [
+            {
+              "name": "bless",
+              "duration": 12
+            },
+            {
+              "name": "haste",
+              "duration": 3
+            }
+          ]
+        ]
+      ],
+      "notes": ["Effect names and durations are synthetic."]
+    },
+    {
+      "id": "collections.affects.full.modifiers",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 04 affects display requirements.",
+        "sanitized": true
+      },
+      "description": "AFFECTS can include names, durations, modifiers, status text, and unknown fields.",
+      "coverage": ["affects", "array", "table", "numeric-normalization", "unknown-fields"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms AFFECTS.",
+        "Session 04 renders representative effect records without claiming final source field names."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "AFFECTS",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "bless",
+        "VAR",
+        "duration",
+        "VAL",
+        "12",
+        "VAR",
+        "modifier",
+        "VAL",
+        "+1 attack",
+        "VAR",
+        "school",
+        "VAL",
+        "enchantment",
+        "TABLE_CLOSE",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "NAME",
+        "VAL",
+        "stone skin",
+        "VAR",
+        "DURATION",
+        "VAL",
+        "0",
+        "VAR",
+        "MODIFIER",
+        "VAL",
+        "+4 AC",
+        "VAR",
+        "source",
+        "VAL",
+        "synthetic fixture",
+        "TABLE_CLOSE",
+        "ARRAY_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "AFFECTS",
+          [
+            {
+              "name": "bless",
+              "duration": 12,
+              "modifier": "+1 attack",
+              "school": "enchantment"
+            },
+            {
+              "NAME": "stone skin",
+              "DURATION": 0,
+              "MODIFIER": "+4 AC",
+              "source": "synthetic fixture"
+            }
+          ]
+        ]
+      ],
+      "notes": [
+        "Effect field names are representative display contracts and not a final source schema claim."
+      ]
+    },
+    {
+      "id": "collections.affects.partial.unknown",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 04 partial affects display requirements.",
+        "sanitized": true
+      },
+      "description": "AFFECTS tolerates partial records, zero-like values, negative durations, and raw string entries.",
+      "coverage": [
+        "affects",
+        "array",
+        "table",
+        "partial-data",
+        "raw-fallback",
+        "numeric-normalization",
+        "unknown-fields"
+      ],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms AFFECTS.",
+        "Session 04 requires partial and raw fallback affect display without overclaiming schema semantics."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "AFFECTS",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "",
+        "VAR",
+        "duration",
+        "VAL",
+        "-1",
+        "VAR",
+        "magnitude",
+        "VAL",
+        "2",
+        "VAR",
+        "note",
+        "VAL",
+        "partial synthetic effect",
+        "TABLE_CLOSE",
+        "VAL",
+        "raw concentration note",
+        "ARRAY_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "AFFECTS",
+          [
+            {
+              "name": "",
+              "duration": -1,
+              "magnitude": 2,
+              "note": "partial synthetic effect"
+            },
+            "raw concentration note"
+          ]
+        ]
+      ],
+      "notes": [
+        "The blank name, negative duration, and raw string are synthetic edge cases for display resilience."
+      ]
+    },
+    {
+      "id": "collections.affects.object.payload",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from parser table behavior and Session 04 object-like affects fallback requirements.",
+        "sanitized": true
+      },
+      "description": "AFFECTS can be preserved as an object-like top-level table.",
+      "coverage": ["affects", "table", "object-like", "raw-fallback"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms AFFECTS.",
+        "Session 04 requires object-like AFFECTS payloads to render conservatively."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "AFFECTS",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "bless",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "duration",
+        "VAL",
+        "12",
+        "VAR",
+        "modifier",
+        "VAL",
+        "+1 attack",
+        "TABLE_CLOSE",
+        "VAR",
+        "ambient",
+        "VAL",
+        "warm glow",
+        "TABLE_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "AFFECTS",
+          {
+            "bless": {
+              "duration": 12,
+              "modifier": "+1 attack"
+            },
+            "ambient": "warm glow"
+          }
+        ]
+      ],
+      "notes": [
+        "Top-level keys are synthetic parser keys and not confirmed source affect identifiers."
+      ]
+    },
+    {
+      "id": "collections.inventory.items.array",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 04 inventory item display requirements.",
+        "sanitized": true
+      },
+      "description": "INVENTORY can include item records with names, counts, locations, and unknown fields.",
+      "coverage": [
+        "inventory",
+        "array",
+        "table",
+        "partial-data",
+        "numeric-normalization",
+        "unknown-fields"
+      ],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms INVENTORY.",
+        "Session 04 renders representative inventory item records without claiming final source field names."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "INVENTORY",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "healing potion",
+        "VAR",
+        "count",
+        "VAL",
+        "2",
+        "VAR",
+        "location",
+        "VAL",
+        "backpack",
+        "VAR",
+        "weight",
+        "VAL",
+        "1",
+        "TABLE_CLOSE",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "item_name",
+        "VAL",
+        "very long synthetic item name for wrapping checks",
+        "VAR",
+        "quantity",
+        "VAL",
+        "0",
+        "TABLE_CLOSE",
+        "ARRAY_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "INVENTORY",
+          [
+            {
+              "name": "healing potion",
+              "count": 2,
+              "location": "backpack",
+              "weight": 1
+            },
+            {
+              "item_name": "very long synthetic item name for wrapping checks",
+              "quantity": 0
+            }
+          ]
+        ]
+      ],
+      "notes": ["Item names and fields are synthetic display contracts for parser and UI tests."]
+    },
+    {
+      "id": "collections.inventory.object.unknown",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from parser table behavior and Session 04 grouped inventory fallback requirements.",
+        "sanitized": true
+      },
+      "description": "INVENTORY can be preserved as grouped tables, counted entries, arrays, and unknown fields.",
+      "coverage": [
+        "inventory",
+        "table",
+        "array",
+        "grouped",
+        "counted",
+        "object-like",
+        "unknown-fields",
+        "numeric-normalization"
+      ],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms INVENTORY.",
+        "Session 04 requires grouped and counted inventory fallbacks while source schema remains representative."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "INVENTORY",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "backpack",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "NAME",
+        "VAL",
+        "iron ration",
+        "VAR",
+        "COUNT",
+        "VAL",
+        "5",
+        "VAR",
+        "slot",
+        "VAL",
+        "side pouch",
+        "TABLE_CLOSE",
+        "VAR",
+        "coins",
+        "VAL",
+        "42",
+        "VAR",
+        "worn",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "practice robe",
+        "ARRAY_CLOSE",
+        "TABLE_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "INVENTORY",
+          {
+            "backpack": {
+              "NAME": "iron ration",
+              "COUNT": 5,
+              "slot": "side pouch"
+            },
+            "coins": 42,
+            "worn": ["practice robe"]
+          }
+        ]
+      ],
+      "notes": [
+        "Group labels and item fields are synthetic and should not be treated as final INVENTORY schema."
+      ]
+    },
+    {
+      "id": "collections.inventory.raw.string",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from Session 04 raw inventory fallback requirements.",
+        "sanitized": true
+      },
+      "description": "INVENTORY scalar text remains displayable through a bounded raw fallback.",
+      "coverage": ["inventory", "scalar", "raw-fallback"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms INVENTORY.",
+        "Session 04 requires raw fallback display when payload shape is uncertain."
+      ],
+      "payloadTokens": ["VAR", "INVENTORY", "VAL", "unparsed inventory text"],
+      "expectedPairs": [["INVENTORY", "unparsed inventory text"]],
+      "notes": ["The scalar value is synthetic and exists only to exercise raw fallback display."]
+    },
+    {
+      "id": "collections.empty.values",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from current parser array and table behavior in server/index.ts.",
+        "sanitized": true
+      },
+      "description": "Empty arrays and empty tables remain explicit values rather than missing data.",
+      "coverage": ["actions", "inventory", "affects", "empty-values", "array", "table"],
+      "sourceFacts": [
+        "Session 03 requires optional data to remain distinct from zero, empty, waiting, and unavailable states.",
+        "server/index.ts returns empty arrays and tables when open and close markers are adjacent."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ACTIONS",
+        "VAL",
+        "ARRAY_OPEN",
+        "ARRAY_CLOSE",
+        "VAR",
+        "AFFECTS",
+        "VAL",
+        "ARRAY_OPEN",
+        "ARRAY_CLOSE",
+        "VAR",
+        "INVENTORY",
+        "VAL",
+        "TABLE_OPEN",
+        "TABLE_CLOSE"
+      ],
+      "expectedPairs": [
+        ["ACTIONS", []],
+        ["AFFECTS", []],
+        ["INVENTORY", {}]
+      ],
+      "notes": ["Later mapping tests should preserve explicit empty collection values."]
+    }
+  ]
+}

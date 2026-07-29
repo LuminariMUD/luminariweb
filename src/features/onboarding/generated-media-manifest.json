@@ -1,0 +1,8 @@
+{
+  "schema": "luminari.onboarding.media/1",
+  "mediaVersion": "v1",
+  "distribution": "media-free-public-snapshot",
+  "generatedBy": "scripts/process-onboarding-media.mjs",
+  "assetCount": 0,
+  "assets": []
+}

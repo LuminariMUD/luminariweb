@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 1,
+  "fixtureFile": "nested-tables",
+  "description": "Nested table and mixed array/table payload fixtures for deterministic parser coverage.",
+  "fixtures": [
+    {
+      "id": "nested.room.with.exits",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from confirmed ROOM and ROOM_EXITS coverage needs.",
+        "sanitized": true
+      },
+      "description": "ROOM parses as a nested table containing exit and coordinate subtables.",
+      "coverage": ["nested-table", "room", "room-exits", "numeric-normalization"],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ROOM and ROOM_EXITS.",
+        "Phase 01 parser hardening requires table and nested table fixtures before behavior changes."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ROOM",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "Nested Fixture Room",
+        "VAR",
+        "exits",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "north",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "vnum",
+        "VAL",
+        "2002",
+        "VAR",
+        "door",
+        "VAL",
+        "open",
+        "TABLE_CLOSE",
+        "VAR",
+        "west",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "vnum",
+        "VAL",
+        "2003",
+        "VAR",
+        "door",
+        "VAL",
+        "closed",
+        "TABLE_CLOSE",
+        "TABLE_CLOSE",
+        "VAR",
+        "coords",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "x",
+        "VAL",
+        "10",
+        "VAR",
+        "y",
+        "VAL",
+        "-5",
+        "VAR",
+        "z",
+        "VAL",
+        "0",
+        "TABLE_CLOSE",
+        "TABLE_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "ROOM",
+          {
+            "name": "Nested Fixture Room",
+            "exits": {
+              "north": {
+                "vnum": 2002,
+                "door": "open"
+              },
+              "west": {
+                "vnum": 2003,
+                "door": "closed"
+              }
+            },
+            "coords": {
+              "x": 10,
+              "y": -5,
+              "z": 0
+            }
+          }
+        ]
+      ],
+      "notes": [
+        "Nested keys are synthetic parser coverage keys and not a source-level ROOM schema guarantee."
+      ]
+    },
+    {
+      "id": "nested.mixed.action.inventory",
+      "version": 1,
+      "origin": {
+        "type": "synthetic",
+        "capturedAt": null,
+        "source": "Constructed from confirmed ACTIONS and INVENTORY coverage needs.",
+        "sanitized": true
+      },
+      "description": "Mixed arrays and tables parse deterministically across ACTIONS and INVENTORY.",
+      "coverage": [
+        "mixed-array-table",
+        "actions",
+        "inventory",
+        "array",
+        "table",
+        "numeric-normalization"
+      ],
+      "sourceFacts": [
+        "PRD Source Protocol Facts confirms ACTIONS and INVENTORY.",
+        "Session 02 preserves list-like and structured values for later feature-specific normalization."
+      ],
+      "payloadTokens": [
+        "VAR",
+        "ACTIONS",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "standard",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "quick draw",
+        "VAR",
+        "cost",
+        "VAL",
+        "1",
+        "TABLE_CLOSE",
+        "ARRAY_CLOSE",
+        "VAR",
+        "INVENTORY",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "items",
+        "VAL",
+        "ARRAY_OPEN",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "practice wand",
+        "VAR",
+        "count",
+        "VAL",
+        "1",
+        "TABLE_CLOSE",
+        "VAL",
+        "TABLE_OPEN",
+        "VAR",
+        "name",
+        "VAL",
+        "trail ration",
+        "VAR",
+        "count",
+        "VAL",
+        "4",
+        "TABLE_CLOSE",
+        "ARRAY_CLOSE",
+        "TABLE_CLOSE"
+      ],
+      "expectedPairs": [
+        [
+          "ACTIONS",
+          [
+            "standard",
+            {
+              "name": "quick draw",
+              "cost": 1
+            }
+          ]
+        ],
+        [
+          "INVENTORY",
+          {
+            "items": [
+              {
+                "name": "practice wand",
+                "count": 1
+              },
+              {
+                "name": "trail ration",
+                "count": 4
+              }
+            ]
+          }
+        ]
+      ],
+      "notes": [
+        "This fixture is deliberately mixed so a future byte encoder can test nested recursion."
+      ]
+    }
+  ]
+}
