@@ -23,14 +23,14 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Run gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: docker://ghcr.io/gitleaks/gitleaks:v8.30.1
         with:
-          args: detect --source . --no-banner --redact
+          args: git /github/workspace --no-banner --redact
 
   codeql:
     name: CodeQL analysis
