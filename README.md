@@ -9,6 +9,17 @@ First-party React and Node web MUD client for LuminariMUD-compatible games, with
 > Contributors may supply their own rights-cleared assets through the documented
 > media pipeline.
 
+## LuminariMUD Eco-System
+
+What we call the "Lumiverse":
+
+- [LuminariMUD game server](https://github.com/LuminariMUD/Luminari-Source)
+- [Sage GraphRAG lore and world building](https://github.com/LuminariMUD/sage)
+- [InterMUD-3 client](https://github.com/LuminariMUD/Intermud3)
+- [Discord bridge](https://github.com/LuminariMUD/discord-mud-chat)
+- [Wilderness editor](https://github.com/LuminariMUD/wildeditor)
+- [Mudlet interface](https://github.com/LuminariMUD/LuminariGUI)
+
 ## Quick Start
 
 Install dependencies once:
